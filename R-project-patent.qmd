@@ -9,3 +9,26 @@ format: html
 
 https://github.com/brl-noe/R-project-patent.git
 
+## Loading the data
+
+```{r}
+here::i_am("R-project-patent.Rproj")
+library(here)
+library(vroom)
+```
+
+```{r}
+## Loading patent data
+patent <- vroom(here("patent.tsv"))
+```
+
+```{r}
+## Loading key indicator data
+key_indicator <- vroom(here("key_indicator.tsv"))
+```
+
+```{r}
+## Loading education data
+education <- vroom(here("education.tsv"))
+```
+
