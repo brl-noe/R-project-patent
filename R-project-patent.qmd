@@ -11,11 +11,13 @@ https://github.com/brl-noe/R-project-patent.git
 
 ## Loading the library
 ```{r}
+#| message: false
 library(here)
 library(vroom)
 library(dplyr)
 library(ggplot2)
 library(tidyr)
+theme_set(theme_bw())
 ```
 
 
@@ -28,15 +30,64 @@ here::i_am("R-project-patent.Rproj")
 ```{r}
 ## Loading patent data
 patent <- vroom(here("patent.tsv"))
-```
 
-```{r}
 ## Loading key indicator data
 key_indicator <- vroom(here("key_indicator.tsv"))
-```
 
-```{r}
 ## Loading education data
 education <- vroom(here("education.tsv"))
+```
+
+## Basics informations about the dabases
+
+Basics informations on the database `education`
+```{r}
+rows_educ <- nrow(education)  # Get number of rows
+cols_educ <- ncol(education) # Get number of columns
+sample_educ <- head(education) # Get the first few rows (default is 6 rows)
+
+# Combine the information into a summary list
+education_summary <- list(
+  NumRows = rows_educ,
+  NumCols = cols_educ,
+  SampleData = sample_educ
+)
+
+# Print the summary
+print(education_summary)
+```
+
+Basics informations on the database `Key indicator`
+```{r}
+rows_key <- nrow(key_indicator)  # Get number of rows
+cols_key <- ncol(key_indicator) # Get number of columns
+sample_key <- head(key_indicator) # Get the first few rows (default is 6 rows)
+
+# Combine the information into a summary list
+key_indicator_summary <- list(
+  NumRows = rows_key,
+  NumCols = cols_key,
+  SampleData = sample_key
+)
+
+# Print the summary
+print(key_indicator_summary)
+```
+
+Basics informations on the database `patent`
+```{r}
+rows_patent <- nrow(patent)  # Get number of rows
+cols_patent <- ncol(patent) # Get number of columns
+sample_patent <- head(patent) # Get the first few rows (default is 6 rows)
+
+# Combine the information into a summary list
+patent_summary <- list(
+  NumRows = rows_patent,
+  NumCols = cols_patent,
+  SampleData = sample_patent
+)
+
+# Print the summary
+print(patent_summary)
 ```
 
