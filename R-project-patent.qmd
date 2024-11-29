@@ -9,12 +9,20 @@ format: html
 
 https://github.com/brl-noe/R-project-patent.git
 
+## Loading the library
+```{r}
+library(here)
+library(vroom)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+```
+
+
 ## Loading the data
 
 ```{r}
 here::i_am("R-project-patent.Rproj")
-library(here)
-library(vroom)
 ```
 
 ```{r}
