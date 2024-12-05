@@ -39,55 +39,44 @@ education <- vroom(here("education.tsv"))
 ```
 
 ## Basics informations about the dabases
-
-Basics informations on the database `education`
 ```{r}
-rows_educ <- nrow(education)  # Get number of rows
-cols_educ <- ncol(education) # Get number of columns
-sample_educ <- head(education) # Get the first few rows (default is 6 rows)
+# Function to generate a data summary
+get_data_summary <- function(df) {
+  rows <- nrow(df)
+  cols <- ncol(df)
+  sample <- head(df)
+  
+  return(list(
+    NumRows = rows,
+    NumCols = cols,
+    SampleData = sample
+  ))
+}
 
-# Combine the information into a summary list
-education_summary <- list(
-  NumRows = rows_educ,
-  NumCols = cols_educ,
-  SampleData = sample_educ
+# Get summaries for each dataset
+patent_summary <- get_data_summary(patent)
+key_indicator_summary <- get_data_summary(key_indicator)
+education_summary <- get_data_summary(education)
+
+# Combine the summaries into a single data frame
+data_summaries <- data.frame(
+  Dataset = c("Patent", "Key Indicator", "Education"),
+  NumRows = c(patent_summary$NumRows, key_indicator_summary$NumRows, education_summary$NumRows),
+  NumCols = c(patent_summary$NumCols, key_indicator_summary$NumCols, education_summary$NumCols),
+  SampleData = list(patent_summary$SampleData, key_indicator_summary$SampleData, education_summary$SampleData),
+  stringsAsFactors = FALSE
 )
 
-# Print the summary
-print(education_summary)
+# Print the summary data frame
+print(data_summaries)
+
+# Display the sample data for each dataset
+for (i in 1:nrow(data_summaries)) {
+  cat(paste0("Sample data for ", data_summaries$Dataset[i], ":\n"))
+  print(data_summaries$SampleData[[i]])
+  cat("\n")
+}
 ```
 
-Basics informations on the database `Key indicator`
-```{r}
-rows_key <- nrow(key_indicator)  # Get number of rows
-cols_key <- ncol(key_indicator) # Get number of columns
-sample_key <- head(key_indicator) # Get the first few rows (default is 6 rows)
 
-# Combine the information into a summary list
-key_indicator_summary <- list(
-  NumRows = rows_key,
-  NumCols = cols_key,
-  SampleData = sample_key
-)
-
-# Print the summary
-print(key_indicator_summary)
-```
-
-Basics informations on the database `patent`
-```{r}
-rows_patent <- nrow(patent)  # Get number of rows
-cols_patent <- ncol(patent) # Get number of columns
-sample_patent <- head(patent) # Get the first few rows (default is 6 rows)
-
-# Combine the information into a summary list
-patent_summary <- list(
-  NumRows = rows_patent,
-  NumCols = cols_patent,
-  SampleData = sample_patent
-)
-
-# Print the summary
-print(patent_summary)
-```
 
