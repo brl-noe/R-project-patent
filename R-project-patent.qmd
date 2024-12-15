@@ -151,7 +151,7 @@ combined_data <- combined_data %>%
   select(-ends_with(".y"))  # Remove all `.y` columns
 ```
 
-In the combined dataset we have varaiable with .x and .y that means we have duplicates. We use the code above to delete the duplicates. 
+In the combined dataset we have variables with .x and .y that means we have duplicates. We use the code above to delete the duplicates. 
 
 ```{r}
 combined_data <- combined_data %>%
