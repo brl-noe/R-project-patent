@@ -93,24 +93,37 @@ for (i in 1:nrow(data_summaries)) {
 ```
 
 ## Description of the data joining, cleaning, etc.
+
+```{r}
+education <- education %>%
+  separate(col = "freq,sex,age,unit,isced11,geo\\TIME_PERIOD", 
+           into = c("freq", "sex", "age", "unit", "isced11", "geo"),
+           sep = ",")
+
+patent <- patent %>%
+  separate(col = "freq,coop_ptn,unit,geo\\TIME_PERIOD", 
+           into = c("freq", "coop_ptn", "unit", "geo"),
+           sep = ",")
+
+key_indicator <- key_indicator %>%
+  separate(col = "freq,unit,na_item,sector,geo\\TIME_PERIOD", 
+           into = c("freq", "unit", "na_item", "sector", "geo"),
+           sep = ",")
+```
+
+We used `separate()`  that allows us to split a single column into multiple columns based on a separator.
+
 ```{r}
 # Join the datasets
-combined_data <- left_join(education, key_indicator, by = "country")
-combined_data <- left_join(combined_data, patent, by = "country")
-```
+combined_data <- education %>% 
+  left_join(key_indicator, by = "geo", relationship = "many-to-many")
 
-The `left_join()` function from the `dplyr` package will perform a left join between the datasets, using the "country" column as the common key. This will ensure that all rows from the education dataset are included, with the corresponding data from the other two datasets.
-
-Data cleaning and transformation:
-```{r}
-# Clean and tidy the data
 combined_data <- combined_data %>%
-  mutate(country = tolower(country)) %>% 
-  pivot_longer(cols = starts_with("X"), names_to = "year", values_to = "value") %>%
-  mutate(year = as.numeric(str_extract(year, "\\d+")))
+  left_join(patent, by = "geo", relationship = "many-to-many")
 ```
 
-We convert the country names to lowercase for consistency. Then we reshape the data into a tidy format, with each row representing a country-year observation. Finally we extract the year from the column names and converting it to a numeric format.
+The `left_join()` function from the `dplyr` package will perform a left join between the datasets, using the "geo" column as the common key. This will ensure that all rows from the education dataset are included, with the corresponding data from the other two datasets.
+
 
 ## Research Question
 
