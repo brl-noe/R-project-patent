@@ -41,12 +41,22 @@ education <- vroom(here("education.tsv"))
 ## Short description of the sources 
 
 For our analysis, we will use tree different datasets all coming from the Eurostat public database. The common key indicator of the 3 datasets is 
-`geo` that refers to the name of the country. This variable will be useful to associate datasets with each other. Other commmon variables to the 3 datasets are `units` (percentage or a row value of the observed variable), `OBS_VALUE` (for observed value) and `TIME_PERIOD` (for the year of the estimation). 
+`geo` that refers to the name of the country. This variable will be useful to associate datasets with each other. Another commmon variable to the 3 datasets is `unit` (percentage or a row value of the observed variable).
 
-Then, the first dataset called patent has as oberved value (`OBS_VALUE`) the number of requests for patent protection of an invention filed with the European Patent Office (EPO) regardless of whether they are granted or not. Here, we see a limit in our analysis coming from the last fact. Indeed, later on the analysis, we will proxy the level of innovation in a country based on this observed value of application for patent however we don't actually know if the patent is granted or not, we mainly know which country (`geo`) applied for how many a patent each year (`TIME_PERIOD`). 
+Then, the first dataset called patent has as oberved value the number of requests for patent protection of an invention filed with the European Patent Office (EPO) regardless of whether they are granted or not. Here, we see a limit in our analysis coming from the last fact. Indeed, later on the analysis, we will proxy the level of innovation in a country based on this observed value of application for patent however we don't actually know if the patent is granted or not, we mainly know which country (`geo`) applied for how many a patent each year. 
 
 
-The second dataset called education contains mainly contains the variable `isced11`. `isced11` is an indication of the the educational attainment level of an individual with each individual being in between 15 and 64 years old (variable `age`). The educational attaiment level corresponds to the highest ISCED (International Standard Classification of Education) level successfully completed, the successful completion of an education programme being validated by a recognised qualification, in other word a qualification officially recognised by the relevant national education authorities or recognised as equivalent to another qualification of formal education. Here for all the countries the educational attaintment level is levels 0-2 that correponds to all the people that have less than primary, primary and lower secondary education as their higher level of education successfully completed. 
+The second dataset called education contains mainly contains the variable `isced11`. `isced11` is an indication of the the educational attainment level of an individual with each individual being in between 15 and 64 years old (variable `age`). The educational attaiment level corresponds to the highest ISCED (International Standard Classification of Education) level successfully completed, the successful completion of an education programme being validated by a recognised qualification, in other word a qualification officially recognised by the relevant national education authorities or recognised as equivalent to another qualification of formal education. The ISCED for 2011 are as following:
+
+Level 0 – Less than primary education
+Level 1 – Primary education
+Level 2 – Lower secondary education
+Level 3 – Upper secondary education
+Level 4 – Post-secondary non-tertiary education
+Level 5 – Short-cycle tertiary education
+Level 6 – Bachelor’s or equivalent level
+Level 7 – Master’s or equivalent level
+Level 8 – Doctoral or equivalent level
 
 
 The third dataset called key_indicator encompass non-financial accounts that provide a description of the different stages of the economic process (variable `na_item`): production, generation of income, distribution of income, redistribution of income, use of income and non-financial accumulation. These stages are estimated in percentage for different sectors and agents of the economy of the country. 
@@ -136,16 +146,21 @@ Moreover, our study will employ a longitudinal analysis, allowing us to examine 
 Our findings could help European policymakers allocate resources more effectively, ensuring that the billions of euros invested in innovation contribute to the European Union's goal of remaining globally competitive. For instance, if we find that higher educational attainment correlates with higher patent applications, we would recommend that policymakers prioritize investments in education. This would potentially be more impactful and cost-effective than investing in other areas of the R&D process, such as infrastructure.
 
 
+### Introcduction by a study of a key variable 
 
+We first create a column with all the years in it and each country's values for every year:
 
+```{r}
+patent_long <- patent |> 
+  pivot_longer(cols = starts_with("20"), names_to = "Years", values_to = "Value")
+print(patent_long)
 
+```
 
-
-
-
-
-
-
+```{r}
+ggplot(patent_long, aes(x=Years)) +
+  geom_bar()
+```
 
 
 
