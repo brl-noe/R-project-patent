@@ -102,10 +102,10 @@ We used `separate()`  that allows us to split a single column into multiple colu
 ```{r}
 # Join the datasets
 combined_data <- education %>% 
-  left_join(key_indicator, by = "geo")
+  left_join(key_indicator, by = "geo", relationship = "many-to-many")
 
 combined_data <- combined_data %>%
-  left_join(patent, by = "geo")
+  left_join(patent, by = "geo", relationship = "many-to-many")
 ```
 
 The `left_join()` function from the `dplyr` package will perform a left join between the datasets, using the "geo" column as the common key. This will ensure that all rows from the education dataset are included, with the corresponding data from the other two datasets.
