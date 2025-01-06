@@ -184,7 +184,23 @@ Our findings could help European policymakers allocate resources more effectivel
 
 We first create a column with all the years in it and each country's values for every year:
 
+<<<<<<< HEAD
 
+=======
+```{r}
+patent_long <- patent |> 
+  pivot_longer(cols = starts_with("20"), names_to = "Years", values_to = "Value")
+print(patent_long)
+
+```
+
+```{r}
+ggplot(patent_long, aes(x=Years)) +
+  geom_bar()
+```
+
+Here we wanted to create a graph that shows the number of patent in function of the time. First we tried to use pivot_longer() to have one column with every year and each year is associated to a number of patent however even with trying different solutions, we didn't get something satisfying. From our understanding the problem is coming from the fact that in the patent data set, some years are characters some others are numerical values. We tried to use as.numeric() and as.character() functions but it didn't seem to give us a satisfying answer.
+>>>>>>> accaebc9fa2478aa517ea3f4edce3643ea2ca2e9
 
 
 
