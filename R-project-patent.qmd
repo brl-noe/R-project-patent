@@ -10,7 +10,7 @@ cache: TRUE
 
 ## Link to the Github Repository
 
-https://github.com/brl-noe/R-project-patent.git
+GitHub Repository <https://github.com/brl-noe/R-project-patent.git>
 
 ## Loading the library
 ```{r}
@@ -26,12 +26,12 @@ theme_set(theme_bw())
 ## Short description of the sources 
 
 For our analysis, we will use tree different datasets all coming from the Eurostat public database. The common key indicator of the 3 datasets is 
-`geo` that refers to the name of the country. This variable will be useful to associate datasets with each other. Another commmon variable to the 3 datasets is `unit` (percentage or a row value of the observed variable).
+`geo` that refers to the name of the country. This variable will be useful to associate datasets with each other. Another common variable to the 3 datasets is `unit` (percentage or a row value of the observed variable).
 
-Then, the first dataset called patent has as oberved value the number of requests for patent protection of an invention filed with the European Patent Office (EPO) regardless of whether they are granted or not. Here, we see a limit in our analysis coming from the last fact. Indeed, later on the analysis, we will proxy the level of innovation in a country based on this observed value of application for patent however we don't actually know if the patent is granted or not, we mainly know which country (`geo`) applied for how many a patent each year. 
+Then, the first dataset called patent has as observed value the number of requests for patent protection of an invention filed with the European Patent Office (EPO) regardless of whether they are granted or not. Here, we see a limit in our analysis coming from the last fact. Indeed, later on the analysis, we will proxy the level of innovation in a country based on this observed value of application for patent however we don't actually know if the patent is granted or not, we mainly know which country (`geo`) applied for how many a patent each year. 
 
 
-The second dataset called education contains mainly contains the variable `isced11`. `isced11` is an indication of the the educational attainment level of an individual with each individual being in between 15 and 64 years old (variable `age`). The educational attaiment level corresponds to the highest ISCED (International Standard Classification of Education) level successfully completed, the successful completion of an education programme being validated by a recognised qualification, in other word a qualification officially recognised by the relevant national education authorities or recognised as equivalent to another qualification of formal education. The ISCED for 2011 are as following:
+The second dataset called education contains mainly contains the variable `isced11`. `isced11` is an indication of the the educational attainment level of an individual with each individual being in between 15 and 64 years old (variable `age`). The educational attainment level corresponds to the highest ISCED (International Standard Classification of Education) level successfully completed, the successful completion of an education programme being validated by a recognised qualification, in other word a qualification officially recognised by the relevant national education authorities or recognised as equivalent to another qualification of formal education. The ISCED for 2011 are as following:
 
 Level 0 – Less than primary education
 Level 1 – Primary education
