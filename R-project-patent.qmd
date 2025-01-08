@@ -193,7 +193,7 @@ combined_data <- combined_data %>%
   left_join(patent, by = "geo", relationship = "many-to-many")
 
 ## The `left_join()` function from the `dplyr` package will perform a left join between the datasets, using the "geo" column as the common key. This will ensure that all rows from the education dataset are included, with the corresponding data from the other two datasets.
-````
+```
 
 
 ```{r}
@@ -260,6 +260,23 @@ combined_data <- combined_data %>%
 
 ### Introduction by a study of a key variable
 
+## Additonal data cleaning 
+
+```{r}
+patent |> summarise(across(starts_with("20"), class))
+```
+Here we find a problem in the patent dataset. Indeed, some Years have values in
+numeric format whereas some others are in the characters format 
+
+```{r}
+patent <- patent |>
+  mutate(across(starts_with("20"), ~ as.numeric(as.character(.))))  
+```
+Mutate() will let us modify existing columns starting with "20" and the function
+across() will spread to all the functions staring with "20" the change from
+numeric values to characters. 
+
+
 We first create a column with all the years in it and each country's
 values for every year:
 ```{r}
@@ -268,17 +285,27 @@ patent_long <- patent |>
 print(patent_long)
 ```
 
+
 ```{r}
-ggplot(patent_long, aes(x=Years)) +
+patent_summary <- patent_long |>
+  group_by(Years) |>
+    filter(!is.na(Value)) |>
+mutate(total_value = sum(Value))
+print(patent_summary)
+```
+
+
+
+```{r}
+patent_summary |>
+ggplot(aes(x=Years)) +
   geom_bar()
 ```
-Here we wanted to create a graph that shows the number of patent in
-function of the time. First we tried to use pivot_longer() to have one
-column with every year and each year is associated to a number of patent
-however even with trying different solutions, we didn't get something
-satisfying. From our understanding the problem is coming from the fact
-that in the patent data set, some years are characters some others are
-numerical values. We tried to use as.numeric() and as.character()
-functions but it didn't seem to give us a satisfying answer.
+
+```{r}
+patent_summary |>
+ggplot(aes(x=Years, y=total_value)) +
+  geom_point()
+```
 
 # IV- conclusion
