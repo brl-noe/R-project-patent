@@ -1,6 +1,9 @@
 ---
 title: "R-project-patent"
-format: html
+format:
+  html: default
+  pdf: default
+cache: TRUE
 ---
 
 ## quarto document
