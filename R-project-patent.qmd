@@ -103,16 +103,15 @@ education <- vroom(here("education.tsv"))
 | Number of rows    | `r NROW(patent)` |
 | Number of columns | `r NCOL(patent)` |
 
-|                   | Key Indicator        |
-|-------------------|----------------------|
-| Number of rows    | `r NROW(white_wine)` |
-| Number of columns | `r NCOL(white_wine)` |
+|                   | Key Indicator           |
+|-------------------|-------------------------|
+| Number of rows    | `r NROW(key_indicator)` |
+| Number of columns | `r NCOL(key_indicator)` |
 
 |                   | Education           |
 |-------------------|---------------------|
 | Number of rows    | `r NROW(education)` |
 | Number of columns | `r NCOL(education)` |
-
 
 ## Description of the data joining, cleaning, etc.
 
