@@ -4,6 +4,9 @@ format:
   html: default
   pdf: default
 cache: TRUE
+editor: 
+  markdown: 
+    wrap: 72
 ---
 
 ## quarto document
@@ -14,11 +17,16 @@ GitHub Repository <https://github.com/brl-noe/R-project-patent.git>
 
 ## Link to the to the data sources
 
-Population by Educational Attainment Level, Sex, and Age:  <https://ec.europa.eu/eurostat/web/products-datasets/-/edat_lfse_03>
-Patent Applications to the European Patent Office by Applicants' / Inventors' Country of Residence: <https://ec.europa.eu/eurostat/web/products-datasets/-/sdg_09_40>
-Key Indicators - Annual Data: <https://ec.europa.eu/eurostat/web/products-datasets/-/nasa_10_ki>
+Population by Educational Attainment Level, Sex, and Age:
+<https://ec.europa.eu/eurostat/web/products-datasets/-/edat_lfse_03>
+Patent Applications to the European Patent Office by Applicants' /
+Inventors' Country of Residence:
+<https://ec.europa.eu/eurostat/web/products-datasets/-/sdg_09_40> Key
+Indicators - Annual Data:
+<https://ec.europa.eu/eurostat/web/products-datasets/-/nasa_10_ki>
 
 ## Loading the library
+
 ```{r}
 #| message: false
 library(here)
@@ -29,28 +37,47 @@ library(tidyr)
 theme_set(theme_bw())
 ```
 
-## Short description of the sources 
+## Short description of the sources
 
-For our analysis, we will use tree different datasets all coming from the Eurostat public database. The common key indicator of the 3 datasets is 
-`geo` that refers to the name of the country. This variable will be useful to associate datasets with each other. Another common variable to the 3 datasets is `unit` (percentage or a row value of the observed variable).
+For our analysis, we will use tree different datasets all coming from
+the Eurostat public database. The common key indicator of the 3 datasets
+is `geo` that refers to the name of the country. This variable will be
+useful to associate datasets with each other. Another common variable to
+the 3 datasets is `unit` (percentage or a row value of the observed
+variable).
 
-Then, the first dataset called patent has as observed value the number of requests for patent protection of an invention filed with the European Patent Office (EPO) regardless of whether they are granted or not. Here, we see a limit in our analysis coming from the last fact. Indeed, later on the analysis, we will proxy the level of innovation in a country based on this observed value of application for patent however we don't actually know if the patent is granted or not, we mainly know which country (`geo`) applied for how many a patent each year. 
+Then, the first dataset called patent has as observed value the number
+of requests for patent protection of an invention filed with the
+European Patent Office (EPO) regardless of whether they are granted or
+not. Here, we see a limit in our analysis coming from the last fact.
+Indeed, later on the analysis, we will proxy the level of innovation in
+a country based on this observed value of application for patent however
+we don't actually know if the patent is granted or not, we mainly know
+which country (`geo`) applied for how many a patent each year.
 
+The second dataset called education contains mainly contains the
+variable `isced11`. `isced11` is an indication of the the educational
+attainment level of an individual with each individual being in between
+15 and 64 years old (variable `age`). The educational attainment level
+corresponds to the highest ISCED (International Standard Classification
+of Education) level successfully completed, the successful completion of
+an education programme being validated by a recognised qualification, in
+other word a qualification officially recognised by the relevant
+national education authorities or recognised as equivalent to another
+qualification of formal education. The ISCED for 2011 are as following:
 
-The second dataset called education contains mainly contains the variable `isced11`. `isced11` is an indication of the the educational attainment level of an individual with each individual being in between 15 and 64 years old (variable `age`). The educational attainment level corresponds to the highest ISCED (International Standard Classification of Education) level successfully completed, the successful completion of an education programme being validated by a recognised qualification, in other word a qualification officially recognised by the relevant national education authorities or recognised as equivalent to another qualification of formal education. The ISCED for 2011 are as following:
+Level 0 – Less than primary education Level 1 – Primary education Level
+2 – Lower secondary education Level 3 – Upper secondary education Level
+4 – Post-secondary non-tertiary education Level 5 – Short-cycle tertiary
+education Level 6 – Bachelor’s or equivalent level Level 7 – Master’s or
+equivalent level Level 8 – Doctoral or equivalent level
 
-Level 0 – Less than primary education
-Level 1 – Primary education
-Level 2 – Lower secondary education
-Level 3 – Upper secondary education
-Level 4 – Post-secondary non-tertiary education
-Level 5 – Short-cycle tertiary education
-Level 6 – Bachelor’s or equivalent level
-Level 7 – Master’s or equivalent level
-Level 8 – Doctoral or equivalent level
-
-
-The third dataset called key_indicator encompass non-financial accounts that provide a description of the different stages of the economic process (variable `na_item`): production, generation of income, distribution of income, redistribution of income, use of income and non-financial accumulation. These stages are estimated in percentage for different sectors and agents of the economy of the country. 
+The third dataset called key_indicator encompass non-financial accounts
+that provide a description of the different stages of the economic
+process (variable `na_item`): production, generation of income,
+distribution of income, redistribution of income, use of income and
+non-financial accumulation. These stages are estimated in percentage for
+different sectors and agents of the economy of the country.
 
 ## Loading the data
 
@@ -69,46 +96,23 @@ key_indicator <- vroom(here("key_indicator.tsv"))
 education <- vroom(here("education.tsv"))
 ```
 
+## Basics informations about the databases
 
-## Basics informations about the dabases
-```{r}
-# Function to generate a data summary
-get_data_summary <- function(df) {
-  rows <- nrow(df)
-  cols <- ncol(df)
-  sample <- head(df)
-  
-  return(list(
-    NumRows = rows,
-    NumCols = cols,
-    SampleData = sample
-  ))
-}
+|                   | Patent           |
+|-------------------|------------------|
+| Number of rows    | `r NROW(patent)` |
+| Number of columns | `r NCOL(patent)` |
 
-# Get summaries for each dataset
-patent_summary <- get_data_summary(patent)
-key_indicator_summary <- get_data_summary(key_indicator)
-education_summary <- get_data_summary(education)
+|                   | Key Indicator        |
+|-------------------|----------------------|
+| Number of rows    | `r NROW(white_wine)` |
+| Number of columns | `r NCOL(white_wine)` |
 
-# Combine the summaries into a single data frame
-data_summaries <- data.frame(
-  Dataset = c("Patent", "Key Indicator", "Education"),
-  NumRows = c(patent_summary$NumRows, key_indicator_summary$NumRows, education_summary$NumRows),
-  NumCols = c(patent_summary$NumCols, key_indicator_summary$NumCols, education_summary$NumCols),
-  SampleData = list(patent_summary$SampleData, key_indicator_summary$SampleData, education_summary$SampleData),
-  stringsAsFactors = FALSE
-)
+|                   | Education           |
+|-------------------|---------------------|
+| Number of rows    | `r NROW(education)` |
+| Number of columns | `r NCOL(education)` |
 
-# Print the summary data frame
-print(data_summaries)
-
-# Display the sample data for each dataset
-for (i in 1:nrow(data_summaries)) {
-  cat(paste0("Sample data for ", data_summaries$Dataset[i], ":\n"))
-  print(data_summaries$SampleData[[i]])
-  cat("\n")
-}
-```
 
 ## Description of the data joining, cleaning, etc.
 
@@ -129,7 +133,8 @@ key_indicator <- key_indicator %>%
            sep = ",")
 ```
 
-We used `separate()`  that allows us to split a single column into multiple columns based on a separator.
+We used `separate()` that allows us to split a single column into
+multiple columns based on a separator.
 
 ```{r}
 # Join the datasets
@@ -140,13 +145,16 @@ combined_data <- combined_data %>%
   left_join(patent, by = "geo", relationship = "many-to-many")
 ```
 
-The `left_join()` function from the `dplyr` package will perform a left join between the datasets, using the "geo" column as the common key. This will ensure that all rows from the education dataset are included, with the corresponding data from the other two datasets.
+The `left_join()` function from the `dplyr` package will perform a left
+join between the datasets, using the "geo" column as the common key.
+This will ensure that all rows from the education dataset are included,
+with the corresponding data from the other two datasets.
 
-<<<<<<< HEAD
 ```{r}
 summary(combined_data)
 combined_data %>% summarize(across(everything(), ~ sum(is.na(.))))
 ```
+
 We check for missing values.
 
 ```{r}
@@ -158,14 +166,15 @@ combined_data <- combined_data %>%
 
 ```
 
-We rename the variables to be more understandable. 
+We rename the variables to be more understandable.
 
 ```{r}
 combined_data <- combined_data %>%
   select(-ends_with(".y"))  # Remove all `.y` columns
 ```
 
-In the combined dataset we have variables with .x and .y that means we have duplicates. We use the code above to delete the duplicates. 
+In the combined dataset we have variables with .x and .y that means we
+have duplicates. We use the code above to delete the duplicates.
 
 ```{r}
 combined_data <- combined_data %>%
@@ -173,29 +182,64 @@ combined_data <- combined_data %>%
          across(where(is.character), as.character))
 ```
 
-We process each column to maintain consistent data types (e.g., numeric or character/str). 
-=======
->>>>>>> 10708b13b1ac7c9f5e442ff9a479ee423d31663f
+We process each column to maintain consistent data types (e.g., numeric
+or character/str).
 
 ## Research Question
 
-In early September, Mario Draghi revealed his plan to make the European Union more competitive. A key part of his plan is to invest billions in innovation. Patent applications serve as a proxy for innovation. A patent is an exclusive right granted for an invention, while a patent application refers to the legal and administrative process of requesting the issuance of a patent. This includes the content of the invention's description and claims, along with the procedural paperwork involved. Therefore, it seems relevant to explore what factors influence the phenomenon of patent applications across European Union countries. Our research question is: **What factors influence patent applications across European Union countries? A longitudinal analysis of education, innovation dynamics, and socioeconomic indicators.**
+In early September, Mario Draghi revealed his plan to make the European
+Union more competitive. A key part of his plan is to invest billions in
+innovation. Patent applications serve as a proxy for innovation. A
+patent is an exclusive right granted for an invention, while a patent
+application refers to the legal and administrative process of requesting
+the issuance of a patent. This includes the content of the invention's
+description and claims, along with the procedural paperwork involved.
+Therefore, it seems relevant to explore what factors influence the
+phenomenon of patent applications across European Union countries. Our
+research question is: **What factors influence patent applications
+across European Union countries? A longitudinal analysis of education,
+innovation dynamics, and socioeconomic indicators.**
 
-This study focuses on the role of education, innovation-related factors, and socioeconomic variables in explaining differences in patent activity across EU countries. We aim to determine whether higher educational attainment correlates with more patents and how economic factors, such as GDP, income inequality, and unemployment, influence this relationship.
+This study focuses on the role of education, innovation-related factors,
+and socioeconomic variables in explaining differences in patent activity
+across EU countries. We aim to determine whether higher educational
+attainment correlates with more patents and how economic factors, such
+as GDP, income inequality, and unemployment, influence this
+relationship.
 
-Moreover, our study will employ a longitudinal analysis, allowing us to examine trends in patent applications and the evolution of the relationship between patent activity, education, and socioeconomic factors across European Union countries over time.We hypothesize that higher economic development is positively correlated with higher educational attainment and, in turn, with increased patent applications. In 2023, countries with the highest number of patent applications were also among the largest global economies (e.g., China ranked 1st, and the USA ranked 2nd), suggesting a link between economic strength and innovation output. This pattern implies that economic resources may facilitate investments in education and research, which are crucial drivers of technological advancement. Moreover, a World Bank article published in 2023 stated: *"Today, there is agreement that education, independent of innate ability, helps spur innovation and technology, and it contributes to productivity and economic growth."* This further supports the idea that education plays a critical role in fostering innovation, reinforcing the need to investigate whether a similar relationship exists within European Union countries.
+Moreover, our study will employ a longitudinal analysis, allowing us to
+examine trends in patent applications and the evolution of the
+relationship between patent activity, education, and socioeconomic
+factors across European Union countries over time.We hypothesize that
+higher economic development is positively correlated with higher
+educational attainment and, in turn, with increased patent applications.
+In 2023, countries with the highest number of patent applications were
+also among the largest global economies (e.g., China ranked 1st, and the
+USA ranked 2nd), suggesting a link between economic strength and
+innovation output. This pattern implies that economic resources may
+facilitate investments in education and research, which are crucial
+drivers of technological advancement. Moreover, a World Bank article
+published in 2023 stated: *"Today, there is agreement that education,
+independent of innate ability, helps spur innovation and technology, and
+it contributes to productivity and economic growth."* This further
+supports the idea that education plays a critical role in fostering
+innovation, reinforcing the need to investigate whether a similar
+relationship exists within European Union countries.
 
-Our findings could help European policymakers allocate resources more effectively, ensuring that the billions of euros invested in innovation contribute to the European Union's goal of remaining globally competitive. For instance, if we find that higher educational attainment correlates with higher patent applications, we would recommend that policymakers prioritize investments in education. This would potentially be more impactful and cost-effective than investing in other areas of the R&D process, such as infrastructure.
+Our findings could help European policymakers allocate resources more
+effectively, ensuring that the billions of euros invested in innovation
+contribute to the European Union's goal of remaining globally
+competitive. For instance, if we find that higher educational attainment
+correlates with higher patent applications, we would recommend that
+policymakers prioritize investments in education. This would potentially
+be more impactful and cost-effective than investing in other areas of
+the R&D process, such as infrastructure.
 
+### Introduction by a study of a key variable
 
+We first create a column with all the years in it and each country's
+values for every year:
 
-### Introduction by a study of a key variable 
-
-We first create a column with all the years in it and each country's values for every year:
-
-<<<<<<< HEAD
-
-=======
 ```{r}
 patent_long <- patent |> 
   pivot_longer(cols = starts_with("20"), names_to = "Years", values_to = "Value")
@@ -208,10 +252,11 @@ ggplot(patent_long, aes(x=Years)) +
   geom_bar()
 ```
 
-Here we wanted to create a graph that shows the number of patent in function of the time. First we tried to use pivot_longer() to have one column with every year and each year is associated to a number of patent however even with trying different solutions, we didn't get something satisfying. From our understanding the problem is coming from the fact that in the patent data set, some years are characters some others are numerical values. We tried to use as.numeric() and as.character() functions but it didn't seem to give us a satisfying answer.
->>>>>>> accaebc9fa2478aa517ea3f4edce3643ea2ca2e9
-
-
-
-
-
+Here we wanted to create a graph that shows the number of patent in
+function of the time. First we tried to use pivot_longer() to have one
+column with every year and each year is associated to a number of patent
+however even with trying different solutions, we didn't get something
+satisfying. From our understanding the problem is coming from the fact
+that in the patent data set, some years are characters some others are
+numerical values. We tried to use as.numeric() and as.character()
+functions but it didn't seem to give us a satisfying answer.
