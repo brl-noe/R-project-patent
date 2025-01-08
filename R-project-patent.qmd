@@ -3,7 +3,7 @@ title: "R-project-patent"
 format:
   html: default
   pdf: default
-cache: TRUE
+    code-fold: true
 editor: 
   markdown: 
     wrap: 72
@@ -29,6 +29,7 @@ Indicators - Annual Data:
 
 ```{r}
 #| message: false
+#| warning = false 
 library(here)
 library(vroom)
 library(dplyr)
@@ -82,10 +83,12 @@ different sectors and agents of the economy of the country.
 ## Loading the data
 
 ```{r}
+#| message: false
 here::i_am("R-project-patent.Rproj")
 ```
 
 ```{r}
+#| message: false
 ## Loading patent data
 patent <- vroom(here("patent.tsv"))
 
