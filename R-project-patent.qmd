@@ -9,7 +9,10 @@ editor:
     wrap: 72
 ---
 
-## quarto document
+#  I- Research question presentation
+# II- Data sets descriptions
+# III- Data analysis
+# IV- conclusion
 
 ## Link to the Github Repository
 
@@ -25,9 +28,10 @@ Inventors' Country of Residence:
 Indicators - Annual Data:
 <https://ec.europa.eu/eurostat/web/products-datasets/-/nasa_10_ki>
 
-## Loading the library
+
 
 ```{r}
+## Loading the library
 #| message: false
 #| echo: false
 library(here)
