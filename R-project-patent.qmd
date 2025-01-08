@@ -29,7 +29,7 @@ Indicators - Annual Data:
 
 ```{r}
 #| message: false
-#| warning = false 
+#| echo: false
 library(here)
 library(vroom)
 library(dplyr)
@@ -84,11 +84,13 @@ different sectors and agents of the economy of the country.
 
 ```{r}
 #| message: false
+#| echo: false
 here::i_am("R-project-patent.Rproj")
 ```
 
 ```{r}
 #| message: false
+#| echo: false
 ## Loading patent data
 patent <- vroom(here("patent.tsv"))
 
@@ -119,6 +121,7 @@ education <- vroom(here("education.tsv"))
 ## Description of the data joining, cleaning, etc.
 
 ```{r}
+#| echo: false
 education <- education %>%
   separate(col = "freq,sex,age,unit,isced11,geo\\TIME_PERIOD", 
            into = c("freq", "sex", "age", "unit", "isced11", "geo"),
@@ -133,59 +136,59 @@ key_indicator <- key_indicator %>%
   separate(col = "freq,unit,na_item,sector,geo\\TIME_PERIOD", 
            into = c("freq", "unit", "na_item", "sector", "geo"),
            sep = ",")
+
+## We used `separate()` that allows us to split a single column into multiple columns based on a separator.
 ```
 
-We used `separate()` that allows us to split a single column into
-multiple columns based on a separator.
-
 ```{r}
+#| echo: false
 # Join the datasets
 combined_data <- education %>% 
   left_join(key_indicator, by = "geo", relationship = "many-to-many")
 
 combined_data <- combined_data %>%
   left_join(patent, by = "geo", relationship = "many-to-many")
+
+## The `left_join()` function from the `dplyr` package will perform a left join between the datasets, using the "geo" column as the common key. This will ensure that all rows from the education dataset are included, with the corresponding data from the other two datasets.
 ```
 
-The `left_join()` function from the `dplyr` package will perform a left
-join between the datasets, using the "geo" column as the common key.
-This will ensure that all rows from the education dataset are included,
-with the corresponding data from the other two datasets.
-
 ```{r}
+#| echo: false
 summary(combined_data)
 combined_data %>% summarize(across(everything(), ~ sum(is.na(.))))
+
+## We check for missing values.
 ```
 
-We check for missing values.
 
 ```{r}
+#| echo: false
 combined_data <- combined_data %>%
   rename(
     country = geo,
     educational_attainment = isced11
   )
 
+## We rename the variables to be more understandable.
 ```
 
-We rename the variables to be more understandable.
 
 ```{r}
+#| echo: false
 combined_data <- combined_data %>%
   select(-ends_with(".y"))  # Remove all `.y` columns
+
+## In the combined dataset we have variables with .x and .y that means we have duplicates. We use the code above to delete the duplicates.
 ```
 
-In the combined dataset we have variables with .x and .y that means we
-have duplicates. We use the code above to delete the duplicates.
-
 ```{r}
+#| echo: false
 combined_data <- combined_data %>%
   mutate(across(where(is.numeric), as.numeric),
          across(where(is.character), as.character))
-```
 
-We process each column to maintain consistent data types (e.g., numeric
-or character/str).
+## We process each column to maintain consistent data types (e.g., numeric or character/str).
+```
 
 ## Research Question
 
