@@ -12,6 +12,12 @@ cache: TRUE
 
 GitHub Repository <https://github.com/brl-noe/R-project-patent.git>
 
+## Link to the to the data sources
+
+Population by Educational Attainment Level, Sex, and Age:  <https://ec.europa.eu/eurostat/web/products-datasets/-/edat_lfse_03>
+Patent Applications to the European Patent Office by Applicants' / Inventors' Country of Residence: <https://ec.europa.eu/eurostat/web/products-datasets/-/sdg_09_40>
+Key Indicators - Annual Data: <https://ec.europa.eu/eurostat/web/products-datasets/-/nasa_10_ki>
+
 ## Loading the library
 ```{r}
 #| message: false
