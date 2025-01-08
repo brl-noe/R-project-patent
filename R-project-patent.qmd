@@ -9,17 +9,62 @@ editor:
     wrap: 72
 ---
 
-#  I- Research question presentation
-# II- Data sets descriptions
-# III- Data analysis
-# IV- conclusion
-
-## Link to the Github Repository
-
 GitHub Repository <https://github.com/brl-noe/R-project-patent.git>
 
-## Link to the to the data sources
+#  I- Research question presentation
 
+  In early September, Mario Draghi revealed his plan to make the European
+Union more competitive. A key part of his plan is to invest billions in
+innovation. Patent applications serve as a proxy for innovation. A
+patent is an exclusive right granted for an invention, while a patent
+application refers to the legal and administrative process of requesting
+the issuance of a patent. This includes the content of the invention's
+description and claims, along with the procedural paperwork involved.
+Therefore, it seems relevant to explore what factors influence the
+phenomenon of patent applications across European Union countries. Our
+research question is: **What factors influence patent applications
+across European Union countries? A longitudinal analysis of education,
+innovation dynamics, and socioeconomic indicators.**
+
+This study focuses on the role of education, innovation-related factors,
+and socioeconomic variables in explaining differences in patent activity
+across EU countries. We aim to determine whether higher educational
+attainment correlates with more patents and how economic factors, such
+as GDP, income inequality, and unemployment, influence this
+relationship.
+
+Moreover, our study will employ a longitudinal analysis, allowing us to
+examine trends in patent applications and the evolution of the
+relationship between patent activity, education, and socioeconomic
+factors across European Union countries over time.We hypothesize that
+higher economic development is positively correlated with higher
+educational attainment and, in turn, with increased patent applications.
+In 2023, countries with the highest number of patent applications were
+also among the largest global economies (e.g., China ranked 1st, and the
+USA ranked 2nd), suggesting a link between economic strength and
+innovation output. This pattern implies that economic resources may
+facilitate investments in education and research, which are crucial
+drivers of technological advancement. Moreover, a World Bank article
+published in 2023 stated: *"Today, there is agreement that education,
+independent of innate ability, helps spur innovation and technology, and
+it contributes to productivity and economic growth."* This further
+supports the idea that education plays a critical role in fostering
+innovation, reinforcing the need to investigate whether a similar
+relationship exists within European Union countries.
+
+Our findings could help European policymakers allocate resources more
+effectively, ensuring that the billions of euros invested in innovation
+contribute to the European Union's goal of remaining globally
+competitive. For instance, if we find that higher educational attainment
+correlates with higher patent applications, we would recommend that
+policymakers prioritize investments in education. This would potentially
+be more impactful and cost-effective than investing in other areas of
+the R&D process, such as infrastructure.
+
+# II- Data sets descriptions
+ 
+  For our analysis, we will use tree different datasets all coming from
+the Eurostat public database:
 Population by Educational Attainment Level, Sex, and Age:
 <https://ec.europa.eu/eurostat/web/products-datasets/-/edat_lfse_03>
 Patent Applications to the European Patent Office by Applicants' /
@@ -28,28 +73,7 @@ Inventors' Country of Residence:
 Indicators - Annual Data:
 <https://ec.europa.eu/eurostat/web/products-datasets/-/nasa_10_ki>
 
-
-
-```{r}
-## Loading the library
-#| message: false
-#| echo: false
-library(here)
-library(vroom)
-library(dplyr)
-library(ggplot2)
-library(tidyr)
-theme_set(theme_bw())
-```
-
-## Short description of the sources
-
-For our analysis, we will use tree different datasets all coming from
-the Eurostat public database. The common key indicator of the 3 datasets
-is `geo` that refers to the name of the country. This variable will be
-useful to associate datasets with each other. Another common variable to
-the 3 datasets is `unit` (percentage or a row value of the observed
-variable).
+The common key indicator of the 3 datasets is `geo` that refers to the name of the country. This variable will be useful to associate datasets with each other. Another common variable to the 3 datasets is `unit` (percentage or a row value of the observed variable).
 
 Then, the first dataset called patent has as observed value the number
 of requests for patent protection of an invention filed with the
@@ -84,9 +108,40 @@ distribution of income, redistribution of income, use of income and
 non-financial accumulation. These stages are estimated in percentage for
 different sectors and agents of the economy of the country.
 
-## Loading the data
+## Basics informations about the databases
+
+|                   | Patent           |
+|-------------------|------------------|
+| Number of rows    | `r NROW(patent)` |
+| Number of columns | `r NCOL(patent)` |
+
+|                   | Key Indicator           |
+|-------------------|-------------------------|
+| Number of rows    | `r NROW(key_indicator)` |
+| Number of columns | `r NCOL(key_indicator)` |
+
+|                   | Education           |
+|-------------------|---------------------|
+| Number of rows    | `r NROW(education)` |
+| Number of columns | `r NCOL(education)` |
+
+
+# III- Data analysis
 
 ```{r}
+## Loading the library
+#| message: false
+#| echo: false
+library(here)
+library(vroom)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+theme_set(theme_bw())
+```
+
+```{r}
+## Loading the data
 #| message: false
 #| echo: false
 here::i_am("R-project-patent.Rproj")
@@ -104,23 +159,6 @@ key_indicator <- vroom(here("key_indicator.tsv"))
 ## Loading education data
 education <- vroom(here("education.tsv"))
 ```
-
-## Basics informations about the databases
-
-|                   | Patent           |
-|-------------------|------------------|
-| Number of rows    | `r NROW(patent)` |
-| Number of columns | `r NCOL(patent)` |
-
-|                   | Key Indicator           |
-|-------------------|-------------------------|
-| Number of rows    | `r NROW(key_indicator)` |
-| Number of columns | `r NCOL(key_indicator)` |
-
-|                   | Education           |
-|-------------------|---------------------|
-| Number of rows    | `r NROW(education)` |
-| Number of columns | `r NCOL(education)` |
 
 ## Description of the data joining, cleaning, etc.
 
@@ -194,56 +232,6 @@ combined_data <- combined_data %>%
 ## We process each column to maintain consistent data types (e.g., numeric or character/str).
 ```
 
-## Research Question
-
-In early September, Mario Draghi revealed his plan to make the European
-Union more competitive. A key part of his plan is to invest billions in
-innovation. Patent applications serve as a proxy for innovation. A
-patent is an exclusive right granted for an invention, while a patent
-application refers to the legal and administrative process of requesting
-the issuance of a patent. This includes the content of the invention's
-description and claims, along with the procedural paperwork involved.
-Therefore, it seems relevant to explore what factors influence the
-phenomenon of patent applications across European Union countries. Our
-research question is: **What factors influence patent applications
-across European Union countries? A longitudinal analysis of education,
-innovation dynamics, and socioeconomic indicators.**
-
-This study focuses on the role of education, innovation-related factors,
-and socioeconomic variables in explaining differences in patent activity
-across EU countries. We aim to determine whether higher educational
-attainment correlates with more patents and how economic factors, such
-as GDP, income inequality, and unemployment, influence this
-relationship.
-
-Moreover, our study will employ a longitudinal analysis, allowing us to
-examine trends in patent applications and the evolution of the
-relationship between patent activity, education, and socioeconomic
-factors across European Union countries over time.We hypothesize that
-higher economic development is positively correlated with higher
-educational attainment and, in turn, with increased patent applications.
-In 2023, countries with the highest number of patent applications were
-also among the largest global economies (e.g., China ranked 1st, and the
-USA ranked 2nd), suggesting a link between economic strength and
-innovation output. This pattern implies that economic resources may
-facilitate investments in education and research, which are crucial
-drivers of technological advancement. Moreover, a World Bank article
-published in 2023 stated: *"Today, there is agreement that education,
-independent of innate ability, helps spur innovation and technology, and
-it contributes to productivity and economic growth."* This further
-supports the idea that education plays a critical role in fostering
-innovation, reinforcing the need to investigate whether a similar
-relationship exists within European Union countries.
-
-Our findings could help European policymakers allocate resources more
-effectively, ensuring that the billions of euros invested in innovation
-contribute to the European Union's goal of remaining globally
-competitive. For instance, if we find that higher educational attainment
-correlates with higher patent applications, we would recommend that
-policymakers prioritize investments in education. This would potentially
-be more impactful and cost-effective than investing in other areas of
-the R&D process, such as infrastructure.
-
 ### Introduction by a study of a key variable
 
 We first create a column with all the years in it and each country's
@@ -269,3 +257,5 @@ satisfying. From our understanding the problem is coming from the fact
 that in the patent data set, some years are characters some others are
 numerical values. We tried to use as.numeric() and as.character()
 functions but it didn't seem to give us a satisfying answer.
+
+# IV- conclusion
