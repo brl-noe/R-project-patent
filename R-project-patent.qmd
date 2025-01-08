@@ -119,6 +119,7 @@ library(vroom)
 library(dplyr)
 library(ggplot2)
 library(tidyr)
+library(stringr)
 theme_set(theme_bw())
 ```
 
@@ -192,15 +193,7 @@ combined_data <- combined_data %>%
   left_join(patent, by = "geo", relationship = "many-to-many")
 
 ## The `left_join()` function from the `dplyr` package will perform a left join between the datasets, using the "geo" column as the common key. This will ensure that all rows from the education dataset are included, with the corresponding data from the other two datasets.
-```
-
-```{r}
-#| echo: false
-summary(combined_data)
-combined_data %>% summarize(across(everything(), ~ sum(is.na(.))))
-
-## We check for missing values.
-```
+````
 
 
 ```{r}
@@ -225,12 +218,45 @@ combined_data <- combined_data %>%
 
 ```{r}
 #| echo: false
+# Handle missing and special values
 combined_data <- combined_data %>%
-  mutate(across(where(is.numeric), as.numeric),
-         across(where(is.character), as.character))
-
-## We process each column to maintain consistent data types (e.g., numeric or character/str).
+  mutate(across(matches("^\\d{4}"), ~ {
+    . <- ifelse(. == "u", NA, .)            # Replace 'u' with NA
+    . <- str_remove(., "[bx]$")            # Remove 'b' and 'x' suffixes
+    as.numeric(.)                          # Convert to numeric
+  }))
 ```
+
+
+```{r}
+# Remove duplicate rows
+combined_data <- combined_data %>%
+  distinct()
+```
+
+
+```{r}
+# Recode sector values
+combined_data <- combined_data %>%
+  mutate(sector = case_when(
+    sector == "S1" ~ "Total economy",
+    sector == "S11" ~ "Non-financial corporations",
+    sector == "S11_12" ~ "Non-financial/financial corporate sectors",
+    sector == "S12" ~ "financial corporations",
+    sector == "S13" ~ "general government",
+    sector == "S14" ~ "Households",
+    sector == "S14_S15" ~ "Households and NPISHs",
+    TRUE ~ sector
+  ))
+```
+
+
+```{r}
+# Create identifier from na_item
+combined_data <- combined_data %>%
+  mutate(indicator_type = str_extract(na_item, "^[^_]+"))
+```
+
 
 ### Introduction by a study of a key variable
 
