@@ -1,9 +1,9 @@
 ---
 title: "R-project-patent"
 format:
-  html: default
-  pdf: default
+  html: 
     code-fold: true
+  pdf: default
 editor: 
   markdown: 
     wrap: 72
@@ -110,24 +110,6 @@ different sectors and agents of the economy of the country.
 
 ## Basics informations about the databases
 
-|                   | Patent           |
-|-------------------|------------------|
-| Number of rows    | `r NROW(patent)` |
-| Number of columns | `r NCOL(patent)` |
-
-|                   | Key Indicator           |
-|-------------------|-------------------------|
-| Number of rows    | `r NROW(key_indicator)` |
-| Number of columns | `r NCOL(key_indicator)` |
-
-|                   | Education           |
-|-------------------|---------------------|
-| Number of rows    | `r NROW(education)` |
-| Number of columns | `r NCOL(education)` |
-
-
-# III- Data analysis
-
 ```{r}
 ## Loading the library
 #| message: false
@@ -159,6 +141,24 @@ key_indicator <- vroom(here("key_indicator.tsv"))
 ## Loading education data
 education <- vroom(here("education.tsv"))
 ```
+
+|                   | Patent           |
+|-------------------|------------------|
+| Number of rows    | `r NROW(patent)` |
+| Number of columns | `r NCOL(patent)` |
+
+|                   | Key Indicator           |
+|-------------------|-------------------------|
+| Number of rows    | `r NROW(key_indicator)` |
+| Number of columns | `r NCOL(key_indicator)` |
+
+|                   | Education           |
+|-------------------|---------------------|
+| Number of rows    | `r NROW(education)` |
+| Number of columns | `r NCOL(education)` |
+
+
+# III- Data analysis
 
 ## Description of the data joining, cleaning, etc.
 
@@ -236,19 +236,16 @@ combined_data <- combined_data %>%
 
 We first create a column with all the years in it and each country's
 values for every year:
-
 ```{r}
-patent_long <- patent |> 
+patent_long <- patent |>
   pivot_longer(cols = starts_with("20"), names_to = "Years", values_to = "Value")
 print(patent_long)
-
 ```
 
 ```{r}
 ggplot(patent_long, aes(x=Years)) +
   geom_bar()
 ```
-
 Here we wanted to create a graph that shows the number of patent in
 function of the time. First we tried to use pivot_longer() to have one
 column with every year and each year is associated to a number of patent
