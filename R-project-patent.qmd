@@ -288,24 +288,54 @@ print(patent_long)
 
 ```{r}
 patent_summary <- patent_long |>
+  filter(geo != "EU27_2020") |>
   group_by(Years) |>
     filter(!is.na(Value)) |>
-mutate(total_value = sum(Value))
+    mutate(total_value = sum(Value))
 print(patent_summary)
 ```
 
-
-
-```{r}
-patent_summary |>
-ggplot(aes(x=Years)) +
-  geom_bar()
-```
+Here we add an additional filter to remove the mean of patent in every country
+in the euro zone (EU27_2020). We need to do that because otherwise some 
+countries in Europe will be counted two times (counted for themselves and inside
+the aggregate EU27_2020). 
 
 ```{r}
 patent_summary |>
 ggplot(aes(x=Years, y=total_value)) +
   geom_point()
 ```
+
+We see a global trend of increasing the total number of patent each year in 
+the european countries. 
+
+```{r}
+patent_EU27 <- patent_long |>
+  filter(geo == "EU27_2020") |>
+  group_by(Years) |>
+    filter(!is.na(Value)) |>
+    mutate(total_value = sum(Value))
+print(patent_EU27)
+```
+
+
+```{r}
+patent_EU27 |>
+ ggplot(aes(x=Years, y=total_value)) +
+  geom_point() 
+```
+
+Similarely as before, if we only consider the 27 countries of the euro zone,
+we notice the same trend in the global number of patent. 
+
+
+
+
+
+
+
+
+
+
 
 # IV- conclusion
