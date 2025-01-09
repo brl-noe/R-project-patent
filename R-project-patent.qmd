@@ -234,6 +234,11 @@ combined_data <- combined_data %>%
   distinct()
 ```
 
+```{r}
+key_indicator |>
+distinct(sector)
+```
+We observe 6 different sectors in our data set that we can label. 
 
 ```{r}
 # Recode sector values
@@ -241,8 +246,7 @@ combined_data <- combined_data %>%
   mutate(sector = case_when(
     sector == "S1" ~ "Total economy",
     sector == "S11" ~ "Non-financial corporations",
-    sector == "S11_12" ~ "Non-financial/financial corporate sectors",
-    sector == "S12" ~ "financial corporations",
+    sector == "S11_S12" ~ "Non-financial/financial corporate sectors",
     sector == "S13" ~ "general government",
     sector == "S14" ~ "Households",
     sector == "S14_S15" ~ "Households and NPISHs",
@@ -250,6 +254,31 @@ combined_data <- combined_data %>%
   ))
 ```
 
+For clarity purpose, we label each level of education attainment in the dataset with their respective signification 
+
+```{r}
+combined_data |>
+distinct(educational_attainment)
+```
+
+We observe the 6 different level of education attainment in our dataset
+
+
+```{r}
+# Recode sector values
+combined_data <- combined_data %>%
+  mutate(educational_attainment = case_when(
+    educational_attainment == "ED0-2" ~ "Lower secondary education",
+    educational_attainment == "ED3_4" ~ "Upper secondary education and Doctoral or equivalent level",
+    educational_attainment == "ED3_4" ~ "Upper secondary education or Post-secondary non-tertiary education",
+    educational_attainment == "ED3_4GEN" ~ "Upper secondary education or Post-secondary non-tertiary education (general)",
+    educational_attainment == "ED3_4VOC" ~ "Upper secondary education or Post-secondary non-tertiary education (vocational)",
+    educational_attainment == "ED5-8" ~ "Between Short-cycle tertiary education and Doctoral or equivalent level",
+    TRUE ~ educational_attainment
+  ))
+```
+
+As well, for clarity purpose, we label each level of education attainment in the dataset with their respective signification 
 
 ```{r}
 # Create identifier from na_item
