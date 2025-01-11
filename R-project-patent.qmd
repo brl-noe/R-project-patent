@@ -351,6 +351,11 @@ prepare_data <- function(education_long, patent_long, start_year = 2012, end_yea
 ```
 
 ```{r}
+# Ensure merged_data is created by running the function
+merged_data <- prepare_data(education_long, patent_long)
+```
+
+```{r}
 filtered_data <- merged_data %>%
   filter(geo %in% c("FR", "DE", "IT"))  # Replace with desired country codes
 
