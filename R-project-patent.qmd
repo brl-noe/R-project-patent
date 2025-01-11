@@ -120,6 +120,10 @@ library(dplyr)
 library(ggplot2)
 library(tidyr)
 library(stringr)
+library(tidyverse)
+library(plm)
+library(AER)
+library(sandwich)
 theme_set(theme_bw())
 ```
 
@@ -161,88 +165,57 @@ education <- vroom(here("education.tsv"))
 
 # III- Data analysis
 
-## Description of the data joining, cleaning, etc.
+## Description of the data joining, cleaning, etc. for combined data
 
 ```{r}
 #| echo: false
+# Data cleaning steps
+# 1. Separate columns
 education <- education %>%
   separate(col = "freq,sex,age,unit,isced11,geo\\TIME_PERIOD", 
            into = c("freq", "sex", "age", "unit", "isced11", "geo"),
            sep = ",")
-
 patent <- patent %>%
   separate(col = "freq,coop_ptn,unit,geo\\TIME_PERIOD", 
            into = c("freq", "coop_ptn", "unit", "geo"),
            sep = ",")
-
 key_indicator <- key_indicator %>%
   separate(col = "freq,unit,na_item,sector,geo\\TIME_PERIOD", 
            into = c("freq", "unit", "na_item", "sector", "geo"),
            sep = ",")
-
-## We used `separate()` that allows us to split a single column into multiple columns based on a separator.
 ```
+
 
 ```{r}
 #| echo: false
-# Join the datasets
+# 2. Join datasets
 combined_data <- education %>% 
-  left_join(key_indicator, by = "geo", relationship = "many-to-many")
-
-combined_data <- combined_data %>%
+  left_join(key_indicator, by = "geo", relationship = "many-to-many") %>%
   left_join(patent, by = "geo", relationship = "many-to-many")
-
-## The `left_join()` function from the `dplyr` package will perform a left join between the datasets, using the "geo" column as the common key. This will ensure that all rows from the education dataset are included, with the corresponding data from the other two datasets.
 ```
-
 
 ```{r}
 #| echo: false
+# 3. Clean and prepare data
 combined_data <- combined_data %>%
   rename(
     country = geo,
     educational_attainment = isced11
-  )
-
-## We rename the variables to be more understandable.
+)
 ```
 
 
 ```{r}
 #| echo: false
 combined_data <- combined_data %>%
-  select(-ends_with(".y"))  # Remove all `.y` columns
-
-## In the combined dataset we have variables with .x and .y that means we have duplicates. We use the code above to delete the duplicates.
-```
-
-```{r}
-#| echo: false
-# Handle missing and special values
-combined_data <- combined_data %>%
+  select(-matches("\\.y$")) %>%  # Remove columns ending with ".y"
   mutate(across(matches("^\\d{4}"), ~ {
-    . <- ifelse(. == "u", NA, .)            # Replace 'u' with NA
-    . <- str_remove(., "[bx]$")            # Remove 'b' and 'x' suffixes
-    as.numeric(.)                          # Convert to numeric
-  }))
-```
-
-
-```{r}
-# Remove duplicate rows
-combined_data <- combined_data %>%
-  distinct()
-```
-
-```{r}
-key_indicator |>
-distinct(sector)
-```
-We observe 6 different sectors in our data set that we can label. 
-
-```{r}
-# Recode sector values
-combined_data <- combined_data %>%
+    value <- ifelse(. == "u", NA, .)  # Replace "u" with NA
+    value <- str_remove(value, "[bx]$")  # Remove trailing "b" or "x"
+    as.numeric(value)  # Convert to numeric
+  })) %>%
+distinct() %>%
+  # Recode sectors
   mutate(sector = case_when(
     sector == "S1" ~ "Total economy",
     sector == "S11" ~ "Non-financial corporations",
@@ -251,45 +224,88 @@ combined_data <- combined_data %>%
     sector == "S14" ~ "Households",
     sector == "S14_S15" ~ "Households and NPISHs",
     TRUE ~ sector
-  ))
-```
-
-For clarity purpose, we label each level of education attainment in the dataset with their respective signification 
-
-```{r}
-combined_data |>
-distinct(educational_attainment)
-```
-
-We observe the 6 different level of education attainment in our dataset
-
-
-```{r}
-# Recode sector values
-combined_data <- combined_data %>%
+  )) %>%
+  # Recode education
   mutate(educational_attainment = case_when(
     educational_attainment == "ED0-2" ~ "Lower secondary education",
-    educational_attainment == "ED3_4" ~ "Upper secondary education and Doctoral or equivalent level",
-    educational_attainment == "ED3_4" ~ "Upper secondary education or Post-secondary non-tertiary education",
-    educational_attainment == "ED3_4GEN" ~ "Upper secondary education or Post-secondary non-tertiary education (general)",
-    educational_attainment == "ED3_4VOC" ~ "Upper secondary education or Post-secondary non-tertiary education (vocational)",
-    educational_attainment == "ED5-8" ~ "Between Short-cycle tertiary education and Doctoral or equivalent level",
+    educational_attainment == "ED3_4" ~ "Upper secondary education and Doctoral",
+    educational_attainment == "ED3_4GEN" ~ "Upper secondary (general)",
+    educational_attainment == "ED3_4VOC" ~ "Upper secondary (vocational)",
+    educational_attainment == "ED5-8" ~ "Tertiary to Doctoral",
     TRUE ~ educational_attainment
   ))
 ```
 
-As well, for clarity purpose, we label each level of education attainment in the dataset with their respective signification 
 
 ```{r}
-# Create identifier from na_item
-combined_data <- combined_data %>%
-  mutate(indicator_type = str_extract(na_item, "^[^_]+"))
+# 4. Prepare for regression
+panel_data <- combined_data %>%
+  # Convert to long format
+  pivot_longer(
+    cols = matches("^\\d{4}$"),
+      names_to = "year",
+      values_to = "value"
+  ) %>%
+  # Impute missing values
+  mutate(
+    patent_count = as.numeric(coop_ptn),
+    patent_count = ifelse(is.na(patent_count), 0, patent_count),  # Example: Replace with 0
+    value = ifelse(is.na(value), mean(value, na.rm = TRUE), value)  # Replace with mean
+  )
+  # Convert year to numeric
+  mutate(year = as.numeric(year))
 ```
 
 
-### Introduction by a study of a key variable
+```{r}
+# 5. Run panel regression
+# We delete the duplicate
+panel_data <- panel_data[!duplicated(panel_data[c("country", "year")]), ]
+# We create pdata
+pdata <- pdata.frame(panel_data, index = c("country", "year"))
 
-## Additonal data cleaning 
+panel_model <- plm(patent_count ~ educational_attainment + sector + value,
+                  data = pdata,
+                  index = c("country", "year"),
+                  model = "within",
+                  effect = "twoways")
+```
+
+
+```{r}
+# 6. Get robust standard errors
+coeftest(panel_model, vcov = vcovHC(panel_model, type = "HC1"))
+```
+
+
+```{r}
+# 7. Additional model with lagged effects
+panel_model_lagged <- plm(patent_count ~ lag(value, 1) + educational_attainment + sector,
+                         data = panel_data,
+                         index = c("country", "year"),
+                         model = "within",
+                         effect = "twoways")
+```
+
+
+```{r}
+# Summary statistics
+summary(panel_model)
+summary(panel_model_lagged)
+```
+
+```{r}
+# We evaluate the residuals
+plot(panel_model$residuals)
+```
+
+```{r}
+# We check for multicollinearity
+library(car)
+vif(panel_model)
+```
+
+## Description of the data joining, cleaning, etc. for patent
 
 ```{r}
 patent |> summarise(across(starts_with("20"), class))
