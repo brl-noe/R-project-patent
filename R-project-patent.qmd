@@ -307,16 +307,6 @@ key_long |>
   geom_bar()
 ```
 
-
-
-
-
-
-
-
-
-
-
 ## Description of the data joining, cleaning,ect. for education
 
 ```{r}
@@ -336,8 +326,6 @@ education_long <- education |>
   pivot_longer(cols = starts_with("20"), names_to = "Years", values_to = "Value")
 print(education_long)
 ```
-
-## Patent and key indicator application
 
 # Patent and education application 
 
@@ -378,67 +366,6 @@ prepare_data <- function(education_long, patent_long, start_year = 2012, end_yea
   return(merged_data)
 }
 ```
-
-# Patent and key indicator application 
-
-```{r}
-prepare_data <- function(key_long, patent_long, start_year = 2012, end_year = 2022) {
-  # Clean education data
-  clean_key <- key_long %>%
-    # Ensure `year` is numeric
-    mutate(year = as.numeric(Years),
-           # Map `sector` to their respective labels
-           sector = case_when(
-            sector == "S1" ~ "Total economy",
-            sector == "S11" ~ "Non-financial corporations",
-            sector == "S11_S12" ~ "Non-financial/financial corporate sectors",
-            sector == "S13" ~ "general government",
-            sector == "S14" ~ "Households",
-            sector == "S14_S15" ~ "Households and NPISHs",
-             TRUE ~ NA_character_  # Assign NA for unexpected values
-           )) %>%
-    # Filter years to reduce data volume
-    filter(year >= start_year, year <= end_year) %>%
-    # Remove rows with NA in key variables
-    filter(!is.na(sector), !is.na(geo)) %>%
-    # Optional: aggregate data (count or percentage representation)
-    group_by(geo, year, sector) %>%
-    summarize(sector = n(), .groups = "drop")
-
-  # Clean patent data
-  clean_key <- key_long %>%
-    # Ensure `year` is numeric
-    mutate(year = as.numeric(Years)) %>%
-    filter(year >= start_year, year <= end_year) %>%
-    filter(!is.na(Value), !is.na(geo)) %>%
-    group_by(geo, year) %>%
-    summarize(patents = sum(Value, na.rm = TRUE), .groups = "drop")
-
-  # Merge datasets
-  merged_data <- inner_join(clean_key, clean_patent, by = c("geo", "year"))
-  return(merged_data)
-}
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ```{r}
 # Ensure merged_data is created by running the function
@@ -485,6 +412,94 @@ plot_education_patents2 <- ggplot(filtered_data,
           plot.title = element_text(size = 14, face = "bold"),
           axis.text.x = element_text(angle = 45, hjust = 1))
 print(plot_education_patents2)
+```
+
+# Patent and key indicator application 
+
+```{r}
+prepare_data2 <- function(key_long, patent_long, start_year = 2012, end_year = 2022) {
+  # Clean education data
+  clean_key <- key_long %>%
+    # Ensure `year` is numeric
+    mutate(year = as.numeric(Years),
+           # Map `sector` to their respective labels
+           sector = case_when(
+            sector == "S1" ~ "Total economy",
+            sector == "S11" ~ "Non-financial corporations",
+            sector == "S11_S12" ~ "Non-financial/financial corporate sectors",
+            sector == "S13" ~ "general government",
+            sector == "S14" ~ "Households",
+            sector == "S14_S15" ~ "Households and NPISHs",
+             TRUE ~ NA_character_  # Assign NA for unexpected values
+           )) %>%
+    # Filter years to reduce data volume
+    filter(year >= start_year, year <= end_year) %>%
+    # Remove rows with NA in key variables
+    filter(!is.na(sector), !is.na(geo)) %>%
+    # Optional: aggregate data (count or percentage representation)
+    group_by(geo, year, sector) %>%
+    summarize(sector = n(), .groups = "drop")
+
+  # Clean patent data
+  clean_key <- key_long %>%
+    # Ensure `year` is numeric
+    mutate(year = as.numeric(Years)) %>%
+    filter(year >= start_year, year <= end_year) %>%
+    filter(!is.na(Value), !is.na(geo)) %>%
+    group_by(geo, year) %>%
+    summarize(patents = sum(Value, na.rm = TRUE), .groups = "drop")
+
+  # Merge datasets
+  merged_data2 <- inner_join(clean_key, clean_patent, by = c("geo", "year"))
+  return(merged_data2)
+}
+```
+
+```{r}
+# Ensure merged_data is created by running the function
+merged_data <- prepare_data(key_long, patent_long)
+```
+
+```{r}
+filtered_data2 <- merged_data %>%
+  filter(geo %in% c("FR", "DE", "IT"))  # Replace with desired country codes
+
+plot_key_patents <- ggplot(filtered_data, 
+         aes(x = year, 
+             y = patents, 
+             color = educational_attainment, 
+             group = interaction(geo, educational_attainment))) +
+    geom_line(size = 1, alpha = 0.7) +
+    facet_wrap(~ geo, scales = "free_y") +
+    scale_color_viridis_d(name = "Education Level") +
+    theme_minimal() +
+    labs(x = "Year",
+         y = "Number of Patents",
+         title = "Patent Activity by Education Level and Country") +
+    theme(legend.position = "right",
+          plot.title = element_text(size = 14, face = "bold"),
+          strip.text = element_text(size = 10))
+print(plot_key_patents)
+```
+
+```{r}
+filtered_data3 <- merged_data2 %>%
+  filter(year == 2022, geo %in% c("FR", "DE", "IT", "EU27_2020"))
+
+plot_key_patents2 <- ggplot(filtered_data, 
+         aes(x = geo, 
+             y = patents, 
+             fill = educational_attainment)) +
+    geom_bar(stat = "identity", position = "dodge") +
+    scale_fill_viridis_d(name = "Education Level") +
+    theme_minimal() +
+    labs(x = "Country",
+         y = "Number of Patents",
+         title = "Patent Activity by Education Level and Country (2022)") +
+    theme(legend.position = "right",
+          plot.title = element_text(size = 14, face = "bold"),
+          axis.text.x = element_text(angle = 45, hjust = 1))
+print(plot_key_patents2)
 ```
 
 ## Description of the data joining, cleaning, etc. for combined data
