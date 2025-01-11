@@ -236,6 +236,9 @@ distinct() %>%
   ))
 ```
 
+## Regression
+
+### Panel regression & panel regression with lagged effect
 
 ```{r}
 # 4. Prepare for regression
@@ -305,6 +308,68 @@ library(car)
 vif(panel_model)
 ```
 
+### Fuzzy regression discontinuity 
+We will create two groups of countries to compare their innovation dynamics based on a study by Stojkoski et al. (2021), titled "Differences in innovation relationships between Central and Eastern Europe and Western Europe: Evidence from CIS 2014". 
+
+To replicate this approach and explore whether there's differences in the context of patent applications, we will group the countries as follows:
+
+Central and Eastern Europe (CEE): This group includes countries such as Bulgaria (BG), Croatia (HR), Hungary(HU), Romania(RO), and Slovakia(SK).
+Western Europe (WE): This group consists of Greece(EL), Spain(ES), Norway(NO), and Portugal(PT).
+
+```{r}
+vet <- combined_data
+
+# Define country groups based on region
+vet <- vet %>%
+  mutate(country_group = case_when(
+    country %in% c("BG", "HR", "HU", "RO", "SK") ~ "CEE",
+    country %in% c("EL", "ES", "NO", "PT") ~ "WE",
+    TRUE ~ "Other"  # To handle any other countries
+  ))
+
+```
+
+```{r}
+library(rdrobust)
+
+# Run the RDD with the country group as the treatment indicator
+m <- rdrobust(vet$patent_count, as.numeric(vet$country_group == "Western"), c = 0)
+
+# Summarize results
+summary(m)
+
+# Plot the RDD with a cutoff at 0 (i.e., Western countries = 1, Eastern countries = 0)
+rdplot(vet$patent_count, as.numeric(vet$country_group == "Western"))
+
+```
+
+```{r}
+
+# Fit a linear model with interaction terms for country group and other predictors
+mw <- lm(patent_count ~ educational_attainment * country_group +
+        sector * country_group + 
+        age + sex, data = vet)
+
+# Output the model summary with robust standard errors
+mwsummary(mw, stars = c('*' = .1, '**' = .05, '***' = .01), vcov = 'robust')
+
+```
+
+```{r}
+# Group by country group and calculate average patents for each group
+binned <- vet %>%
+  group_by(country_group) %>%
+  summarize(avg_patents = mean(patent_count))
+
+# Plot the average patent applications for Western vs. Eastern countries
+ggplot(binned, aes(x = country_group, y = avg_patents)) + 
+  geom_bar(stat = "identity", fill = "skyblue") +
+  theme_minimal() +
+  labs(title = "Average Patent Applications by Country Group", 
+       x = "Country Group", y = "Average Patent Applications")
+```
+
+
 ## Description of the data joining, cleaning, etc. for patent
 
 ```{r}
@@ -370,10 +435,92 @@ patent_EU27 |>
   geom_point() 
 ```
 
-Similarely as before, if we only consider the 27 countries of the euro zone,
+Similarly as before, if we only consider the 27 countries of the euro zone,
 we notice the same trend in the global number of patent. 
 
-Commit for error message
+
+### Sector analysis
+
+
+```{r}
+key_indicator |>
+   summarise(across(matches("^20|^19"), class))
+```
+
+We observe again that many of the columns contains characters that we have to 
+convert to numeric values. 
+
+```{r}
+key_indicator2 <- key_indicator |>
+  mutate(across(matches("^20|^19"), ~ as.numeric(.))) |> 
+  print(key_indicator2)
+```
+
+```{r}
+key_indicator2 |>
+  group_by(na_item) |>
+  select(sector)
+```
+Here we have a big problem because each sector has its own `na_item` that 
+correspond to the method of calculation. In other words, in each countries the 
+method to evaluate the percentage of each sector in the economy of the country 
+is different. This fact limits the rigor of the approach for any analysis based 
+on sectors. 
+
+
+
+### Education analysis
+
+```{r}
+education |>
+   summarise(across(matches("^20|^19"), class))
+```
+
+```{r}
+education2 <- education |>
+  mutate(across(matches("^20|^19"), ~ as.numeric(.))) |> 
+  print(education2)
+```
+
+
+### Data cleaning and merging 2
+
+## Cleaning each dataset separetaly
+
+```{r}
+# Since many of the columns for the years in the data set are considered as 
+# character values we have to arrange it 
+
+patent2 <- patent |>
+  mutate(across(starts_with("20"), ~ as.numeric(.))) 
+
+education2 <- education |>
+  mutate(across(matches("^20|^19"), ~ as.numeric(.))) 
+
+key_indicator2 <- key_indicator |>
+  mutate(across(matches("^20|^19"), ~ as.numeric(.))) 
+```
+
+## Merge them
+
+```{r}
+#| echo: false
+# 2. Join datasets
+combined_data2 <- education2 %>% 
+  left_join(key_indicator2, by = "geo", relationship = "many-to-many") %>%
+  left_join(patent, by = "geo", relationship = "many-to-many")
+```
+
+```{r}
+combined_data2 <- combined_data2 %>%
+  select(where(~ !all(is.na(.))))
+```
+
+
+
+
+
+
 
 
 
