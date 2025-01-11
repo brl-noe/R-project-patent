@@ -11,9 +11,9 @@ editor:
 
 GitHub Repository <https://github.com/brl-noe/R-project-patent.git>
 
-#  I- Research question presentation
+# I- Research question presentation
 
-  In early September, Mario Draghi revealed his plan to make the European
+In early September, Mario Draghi revealed his plan to make the European
 Union more competitive. A key part of his plan is to invest billions in
 innovation. Patent applications serve as a proxy for innovation. A
 patent is an exclusive right granted for an invention, while a patent
@@ -62,10 +62,10 @@ be more impactful and cost-effective than investing in other areas of
 the R&D process, such as infrastructure.
 
 # II- Data sets descriptions
- 
-  For our analysis, we will use tree different datasets all coming from
-the Eurostat public database:
-Population by Educational Attainment Level, Sex, and Age:
+
+For our analysis, we will use tree different datasets all coming from
+the Eurostat public database: Population by Educational Attainment
+Level, Sex, and Age:
 <https://ec.europa.eu/eurostat/web/products-datasets/-/edat_lfse_03>
 Patent Applications to the European Patent Office by Applicants' /
 Inventors' Country of Residence:
@@ -73,7 +73,10 @@ Inventors' Country of Residence:
 Indicators - Annual Data:
 <https://ec.europa.eu/eurostat/web/products-datasets/-/nasa_10_ki>
 
-The common key indicator of the 3 datasets is `geo` that refers to the name of the country. This variable will be useful to associate datasets with each other. Another common variable to the 3 datasets is `unit` (percentage or a row value of the observed variable).
+The common key indicator of the 3 datasets is `geo` that refers to the
+name of the country. This variable will be useful to associate datasets
+with each other. Another common variable to the 3 datasets is `unit`
+(percentage or a row value of the observed variable).
 
 Then, the first dataset called patent has as observed value the number
 of requests for patent protection of an invention filed with the
@@ -164,7 +167,6 @@ education <- vroom(here("education.tsv"))
 | Number of rows    | `r NROW(education)` |
 | Number of columns | `r NCOL(education)` |
 
-
 # III- Data analysis
 
 ```{r}
@@ -185,32 +187,33 @@ key_indicator <- key_indicator %>%
            sep = ",")
 ```
 
-
 ## Description of the data joining, cleaning, etc. for patent
 
 ```{r}
 patent |> summarise(across(starts_with("20"), class))
 ```
-Here we find a problem in the patent dataset. Indeed, some Years have values in
-numeric format whereas some others are in the characters format 
+
+Here we find a problem in the patent dataset. Indeed, some Years have
+values in numeric format whereas some others are in the characters
+format
 
 ```{r}
 patent <- patent |>
   mutate(across(starts_with("20"), ~ as.numeric(as.character(.))))  
 ```
-Mutate() will let us modify existing columns starting with "20" and the function
-across() will spread to all the functions staring with "20" the change from
-numeric values to characters. 
 
+Mutate() will let us modify existing columns starting with "20" and the
+function across() will spread to all the functions staring with "20" the
+change from numeric values to characters.
 
 We first create a column with all the years in it and each country's
 values for every year:
+
 ```{r}
 patent_long <- patent |>
   pivot_longer(cols = starts_with("20"), names_to = "Years", values_to = "Value")
 print(patent_long)
 ```
-
 
 ```{r}
 patent_summary <- patent_long |>
@@ -221,10 +224,10 @@ patent_summary <- patent_long |>
 print(patent_summary)
 ```
 
-Here we add an additional filter to remove the mean of patent in every country
-in the euro zone (EU27_2020). We need to do that because otherwise some 
-countries in Europe will be counted two times (counted for themselves and inside
-the aggregate EU27_2020). 
+Here we add an additional filter to remove the mean of patent in every
+country in the euro zone (EU27_2020). We need to do that because
+otherwise some countries in Europe will be counted two times (counted
+for themselves and inside the aggregate EU27_2020).
 
 ```{r}
 patent_summary |>
@@ -232,8 +235,8 @@ ggplot(aes(x=Years, y=total_value)) +
   geom_point()
 ```
 
-We see a global trend of increasing the total number of patent each year in 
-the european countries. 
+We see a global trend of increasing the total number of patent each year
+in the european countries.
 
 ```{r}
 patent_EU27 <- patent_long |>
@@ -244,15 +247,14 @@ patent_EU27 <- patent_long |>
 print(patent_EU27)
 ```
 
-
 ```{r}
 patent_EU27 |>
  ggplot(aes(x=Years, y=total_value)) +
   geom_point() 
 ```
 
-Similarely as before, if we only consider the 27 countries of the euro zone,
-we notice the same trend in the global number of patent.
+Similarely as before, if we only consider the 27 countries of the euro
+zone, we notice the same trend in the global number of patent.
 
 ## Description of the data joining, cleaning, etc. for key indicator
 
@@ -261,8 +263,8 @@ key_indicator |>
    summarise(across(matches("^20|^19"), class))
 ```
 
-We observe again that many of the columns contains characters that we have to 
-convert to numeric values. 
+We observe again that many of the columns contains characters that we
+have to convert to numeric values.
 
 ```{r}
 key_indicator2 <- key_indicator |>
@@ -270,28 +272,17 @@ key_indicator2 <- key_indicator |>
   print(key_indicator2)
 ```
 
-
-
-Here we have a big problem because each sector has its own na_item that 
-correspond to the method of calculation. In other words, in each countries the 
-method to evaluate the percentage of each sector in the economy of the country 
-is different. This fact limits the rigor of the approach for any analysis based 
-on sectors.
+Here we have a big problem because each sector has its own na_item that
+correspond to the method of calculation. In other words, in each
+countries the method to evaluate the percentage of each sector in the
+economy of the country is different. This fact limits the rigor of the
+approach for any analysis based  on sectors.
 
 ```{r}
 key_indicator2 |>
   filter(geo == "FR") |>
   ggplot(aes())
 ```
-
-
-
-
-
-
-
-
-
 
 ```{r}
 key_long <- key_indicator |>
@@ -327,7 +318,7 @@ education_long <- education |>
 print(education_long)
 ```
 
-# Patent and education application 
+# Patent and education application
 
 ```{r}
 prepare_data <- function(education_long, patent_long, start_year = 2012, end_year = 2022) {
@@ -414,7 +405,7 @@ plot_education_patents2 <- ggplot(filtered_data,
 print(plot_education_patents2)
 ```
 
-# Patent and key indicator application 
+# Patent and key indicator application
 
 ```{r}
 prepare_data2 <- function(key_long, patent_long, start_year = 2012, end_year = 2022) {
@@ -424,33 +415,35 @@ prepare_data2 <- function(key_long, patent_long, start_year = 2012, end_year = 2
     mutate(year = as.numeric(Years),
            # Map `sector` to their respective labels
            sector = case_when(
-            sector == "S1" ~ "Total economy",
-            sector == "S11" ~ "Non-financial corporations",
-            sector == "S11_S12" ~ "Non-financial/financial corporate sectors",
-            sector == "S13" ~ "general government",
-            sector == "S14" ~ "Households",
-            sector == "S14_S15" ~ "Households and NPISHs",
+             sector == "S1" ~ "Total economy",
+             sector == "S11" ~ "Non-financial corporations",
+             sector == "S11_S12" ~ "Non-financial/financial corporate sectors",
+             sector == "S13" ~ "general government",
+             sector == "S14" ~ "Households",
+             sector == "S14_S15" ~ "Households and NPISHs",
              TRUE ~ NA_character_  # Assign NA for unexpected values
            )) %>%
     # Filter years to reduce data volume
     filter(year >= start_year, year <= end_year) %>%
     # Remove rows with NA in key variables
-    filter(!is.na(sector), !is.na(geo)) %>%
-    # Optional: aggregate data (count or percentage representation)
-    group_by(geo, year, sector) %>%
-    summarize(sector = n(), .groups = "drop")
+    filter(!is.na(sector), !is.na(geo))
 
   # Clean patent data
-  clean_key <- key_long %>%
+  clean_patent <- patent_long %>%
     # Ensure `year` is numeric
-    mutate(year = as.numeric(Years)) %>%
+    mutate(year = as.numeric(Years),
+           # Ensure `Value` is numeric
+           Value = as.numeric(Value)) %>%
+    # Filter valid years and remove rows with missing data
     filter(year >= start_year, year <= end_year) %>%
     filter(!is.na(Value), !is.na(geo)) %>%
+    # Group and summarize patent data
     group_by(geo, year) %>%
     summarize(patents = sum(Value, na.rm = TRUE), .groups = "drop")
 
   # Merge datasets
   merged_data2 <- inner_join(clean_key, clean_patent, by = c("geo", "year"))
+  
   return(merged_data2)
 }
 ```
@@ -464,7 +457,7 @@ merged_data2 <- prepare_data2(key_long, patent_long)
 filtered_data2 <- merged_data2 %>%
   filter(geo %in% c("FR", "DE", "IT"))  # Replace with desired country codes
 
-plot_key_patents <- ggplot(filtered_data, 
+plot_key_patents <- ggplot(filtered_data2, 
          aes(x = year, 
              y = patents, 
              color = sector, 
@@ -486,7 +479,7 @@ print(plot_key_patents)
 filtered_data3 <- merged_data2 %>%
   filter(year == 2022, geo %in% c("FR", "DE", "IT", "EU27_2020"))
 
-plot_key_patents3 <- ggplot(filtered_data, 
+plot_key_patents3 <- ggplot(filtered_data3, 
          aes(x = geo, 
              y = patents, 
              fill = sector)) +
@@ -505,91 +498,18 @@ print(plot_key_patents3)
 ## Description of the data joining, cleaning, etc. for combined data
 
 ```{r}
-education_long_agg <- education_long %>%
-  group_by(geo, Years) %>%
-  summarise()
-
-patent_long_agg <- patent_long %>%
-  group_by(geo, Years) %>%
-  summarise()
-
-key_long_agg <- key_long %>%
-  group_by(geo, Years) %>%
-  summarise()
-
-combined_data <- education_long_agg %>%
-  inner_join(patent_long_agg, by = c("geo", "Years")) %>%
-  inner_join(key_long_agg, by = c("geo", "Years"))
-
+combined_data <- merged_data %>%
+  full_join(merged_data2, by = c("geo", "year"), relationship = "many-to-many") %>%
+  dplyr::select(-patents.y)  # Ensure the correct select function is used
 ```
-
 
 ```{r}
 #| echo: false
 # 3. Clean and prepare data
 combined_data <- combined_data %>%
   rename(
-    country = geo,
-    educational_attainment = isced11
+    country = geo
 )
-```
-
-
-```{r}
-#| echo: false
-combined_data <- combined_data %>%
-  select(-matches("\\.y$")) %>%  # Remove columns ending with ".y"
-  mutate(across(matches("^\\d{4}"), ~ {
-    value <- ifelse(. == "u", NA, .)  # Replace "u" with NA
-    value <- str_remove(value, "[bx]$")  # Remove trailing "b" or "x"
-    as.numeric(value)  # Convert to numeric
-  })) %>%
-distinct() %>%
-  # Recode sectors
-  mutate(sector = case_when(
-    sector == "S1" ~ "Total economy",
-    sector == "S11" ~ "Non-financial corporations",
-    sector == "S11_S12" ~ "Non-financial/financial corporate sectors",
-    sector == "S13" ~ "general government",
-    sector == "S14" ~ "Households",
-    sector == "S14_S15" ~ "Households and NPISHs",
-    TRUE ~ sector
-  )) %>%
-  # Recode education
-  mutate(educational_attainment = case_when(
-    educational_attainment == "ED0-2" ~ "Lower secondary education",
-    educational_attainment == "ED3_4" ~ "Upper secondary education and Doctoral",
-    educational_attainment == "ED3_4GEN" ~ "Upper secondary (general)",
-    educational_attainment == "ED3_4VOC" ~ "Upper secondary (vocational)",
-    educational_attainment == "ED5-8" ~ "Tertiary to Doctoral",
-    TRUE ~ educational_attainment
-  )) 
-```
-
-```{r}
-# First, let's identify which columns to keep
-combined_data %>%
-  names() %>%
-  print()
-
-# Then create a focused dataset
-focused_data <- combined_data %>%
-  # Select only relevant columns
-  select(
-    country,
-    educational_attainment,
-    sector,
-    coop_ptn,
-    matches("^20(1[2-9]|2[0-2])") # This keeps years 2013-2023
-  ) %>%
-  # Keep only the sectors and education levels relevant to patent analysis
-  filter(
-    sector %in% c("Total economy", "Non-financial corporations"),
-    !is.na(coop_ptn)
-  )
-
-# Check the dimensions of our new dataset
-dim(focused_data)
 ```
 
 ## Regression
@@ -615,7 +535,6 @@ panel_data <- combined_data %>%
   mutate(year = as.numeric(year))
 ```
 
-
 ```{r}
 # 5. Run panel regression
 # We delete the duplicate
@@ -630,12 +549,10 @@ panel_model <- plm(patent_count ~ educational_attainment + sector + value,
                   effect = "twoways")
 ```
 
-
 ```{r}
 # 6. Get robust standard errors
 coeftest(panel_model, vcov = vcovHC(panel_model, type = "HC1"))
 ```
-
 
 ```{r}
 # 7. Additional model with lagged effects
@@ -645,7 +562,6 @@ panel_model_lagged <- plm(patent_count ~ lag(value, 1) + educational_attainment 
                          model = "within",
                          effect = "twoways")
 ```
-
 
 ```{r}
 # Summary statistics
@@ -666,12 +582,19 @@ vif(panel_model)
 
 ### Differences between region (CEE ans WE)
 
-We will create two groups of countries to compare their innovation dynamics based on a study by Stojkoski et al. (2021), titled "Differences in innovation relationships between Central and Eastern Europe and Western Europe: Evidence from CIS 2014". 
+We will create two groups of countries to compare their innovation
+dynamics based on a study by Stojkoski et al. (2021), titled
+"Differences in innovation relationships between Central and Eastern
+Europe and Western Europe: Evidence from CIS 2014".
 
-To replicate this approach and explore whether there's differences in the context of patent applications, we will group the countries as follows:
+To replicate this approach and explore whether there's differences in
+the context of patent applications, we will group the countries as
+follows:
 
-Central and Eastern Europe (CEE): This group includes countries such as Bulgaria (BG), Croatia (HR), Hungary(HU), Romania(RO), and Slovakia(SK).
-Western Europe (WE): This group consists of Greece(EL), Spain(ES), Norway(NO), and Portugal(PT).
+Central and Eastern Europe (CEE): This group includes countries such as
+Bulgaria (BG), Croatia (HR), Hungary(HU), Romania(RO), and Slovakia(SK).
+Western Europe (WE): This group consists of Greece(EL), Spain(ES),
+Norway(NO), and Portugal(PT).
 
 ```{r}
 vet <- combined_data
@@ -687,37 +610,52 @@ vet <- vet %>%
 ```
 
 ```{r}
-library(rdrobust)
-
-# Run the RDD with the country group as the treatment indicator
-m <- rdrobust(vet$patent_count, as.numeric(vet$country_group == "Western"), c = 0)
-
-# Summarize results
-summary(m)
-
-# Plot the RDD with a cutoff at 0 (i.e., Western countries = 1, Eastern countries = 0)
-rdplot(vet$patent_count, as.numeric(vet$country_group == "Western"))
-
+ # Create a binary variable for Western countries (1 for Western, 0 for non-Western)
+vet <- vet %>%
+  mutate(is_western_binary = ifelse(country_group == "WE", 1, 0))
 ```
 
 ```{r}
+# Load the necessary library
+library(rdrobust)
+library(dplyr)
+library(ggplot2)
 
+# Step 3: Handle missing data (check for missing values in necessary columns)
+vet <- vet %>%
+  filter(!is.na(patents.x) & !is.na(is_western_binary))
+```
+
+```{r}
+# Step 4: Run RDD (Regression Discontinuity Design) using the existing binary indicator
+m <- rdrobust(vet$patents.x, vet$is_western_binary, c = 0)
+
+# Step 5: Summarize and plot the RDD result
+summary(m)
+rdplot(vet$patents.x, vet$is_western_binary)
+```
+
+
+```{r}
 # Fit a linear model with interaction terms for country group and other predictors
-mw <- lm(patent_count ~ educational_attainment * country_group +
+mw <- lm(patents.x ~ educational_attainment * country_group +
         sector * country_group + 
         age + sex, data = vet)
 
 # Output the model summary with robust standard errors
 mwsummary(mw, stars = c('*' = .1, '**' = .05, '***' = .01), vcov = 'robust')
-
 ```
+
 
 ```{r}
 # Group by country group and calculate average patents for each group
 binned <- vet %>%
   group_by(country_group) %>%
-  summarize(avg_patents = mean(patent_count))
+  summarize(avg_patents = mean(patents.x, na.rm = TRUE))  # Ensure to handle missing values
+```
 
+
+```{r}
 # Plot the average patent applications for Western vs. Eastern countries
 ggplot(binned, aes(x = country_group, y = avg_patents)) + 
   geom_bar(stat = "identity", fill = "skyblue") +
