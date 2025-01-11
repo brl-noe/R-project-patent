@@ -457,25 +457,25 @@ prepare_data2 <- function(key_long, patent_long, start_year = 2012, end_year = 2
 
 ```{r}
 # Ensure merged_data is created by running the function
-merged_data <- prepare_data(key_long, patent_long)
+merged_data2 <- prepare_data2(key_long, patent_long)
 ```
 
 ```{r}
-filtered_data2 <- merged_data %>%
+filtered_data2 <- merged_data2 %>%
   filter(geo %in% c("FR", "DE", "IT"))  # Replace with desired country codes
 
 plot_key_patents <- ggplot(filtered_data, 
          aes(x = year, 
              y = patents, 
-             color = educational_attainment, 
-             group = interaction(geo, educational_attainment))) +
+             color = sector, 
+             group = interaction(geo, sector))) +
     geom_line(size = 1, alpha = 0.7) +
     facet_wrap(~ geo, scales = "free_y") +
-    scale_color_viridis_d(name = "Education Level") +
+    scale_color_viridis_d(name = "Sector") +
     theme_minimal() +
     labs(x = "Year",
          y = "Number of Patents",
-         title = "Patent Activity by Education Level and Country") +
+         title = "Patent Activity by Sector and Country") +
     theme(legend.position = "right",
           plot.title = element_text(size = 14, face = "bold"),
           strip.text = element_text(size = 10))
@@ -486,20 +486,20 @@ print(plot_key_patents)
 filtered_data3 <- merged_data2 %>%
   filter(year == 2022, geo %in% c("FR", "DE", "IT", "EU27_2020"))
 
-plot_key_patents2 <- ggplot(filtered_data, 
+plot_key_patents3 <- ggplot(filtered_data, 
          aes(x = geo, 
              y = patents, 
-             fill = educational_attainment)) +
+             fill = sector)) +
     geom_bar(stat = "identity", position = "dodge") +
     scale_fill_viridis_d(name = "Education Level") +
     theme_minimal() +
     labs(x = "Country",
          y = "Number of Patents",
-         title = "Patent Activity by Education Level and Country (2022)") +
+         title = "Patent Activity by Sector and Country (2022)") +
     theme(legend.position = "right",
           plot.title = element_text(size = 14, face = "bold"),
           axis.text.x = element_text(angle = 45, hjust = 1))
-print(plot_key_patents2)
+print(plot_key_patents3)
 ```
 
 ## Description of the data joining, cleaning, etc. for combined data
