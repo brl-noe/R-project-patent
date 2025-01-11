@@ -114,7 +114,6 @@ different sectors and agents of the economy of the country.
 ## Loading the library
 #| message: false
 #| echo: false
-install.packages("conflicted", "here", "vroom","dplyr","ggplot2","tidyr","stringr", "tidyverse","plm","AER", "sandwich")
 library(conflicted)
 library(here)
 library(vroom)
@@ -127,6 +126,7 @@ library(plm)
 library(AER)
 library(sandwich)
 theme_set(theme_bw())
+conflicted::conflict_prefer("filter", "dplyr")
 ```
 
 ```{r}
@@ -167,8 +167,6 @@ education <- vroom(here("education.tsv"))
 
 # III- Data analysis
 
-## Description of the data joining, cleaning, etc. for combined data
-
 ```{r}
 #| echo: false
 # Data cleaning steps
@@ -188,13 +186,143 @@ key_indicator <- key_indicator %>%
 ```
 
 
+## Description of the data joining, cleaning, etc. for patent
+
 ```{r}
-#| echo: false
-# 2. Join datasets
-combined_data <- education %>% 
-  left_join(key_indicator, by = "geo", relationship = "many-to-many") %>%
-  left_join(patent, by = "geo", relationship = "many-to-many")
+patent |> summarise(across(starts_with("20"), class))
 ```
+Here we find a problem in the patent dataset. Indeed, some Years have values in
+numeric format whereas some others are in the characters format 
+
+```{r}
+patent <- patent |>
+  mutate(across(starts_with("20"), ~ as.numeric(as.character(.))))  
+```
+Mutate() will let us modify existing columns starting with "20" and the function
+across() will spread to all the functions staring with "20" the change from
+numeric values to characters. 
+
+
+We first create a column with all the years in it and each country's
+values for every year:
+```{r}
+patent_long <- patent |>
+  pivot_longer(cols = starts_with("20"), names_to = "Years", values_to = "Value")
+print(patent_long)
+```
+
+
+```{r}
+patent_summary <- patent_long |>
+  filter(geo != "EU27_2020") |>
+  group_by(Years) |>
+    filter(!is.na(Value)) |>
+    mutate(total_value = sum(Value))
+print(patent_summary)
+```
+
+Here we add an additional filter to remove the mean of patent in every country
+in the euro zone (EU27_2020). We need to do that because otherwise some 
+countries in Europe will be counted two times (counted for themselves and inside
+the aggregate EU27_2020). 
+
+```{r}
+patent_summary |>
+ggplot(aes(x=Years, y=total_value)) +
+  geom_point()
+```
+
+We see a global trend of increasing the total number of patent each year in 
+the european countries. 
+
+```{r}
+patent_EU27 <- patent_long |>
+  filter(geo == "EU27_2020") |>
+  group_by(Years) |>
+    filter(!is.na(Value)) |>
+    mutate(total_value = sum(Value))
+print(patent_EU27)
+```
+
+
+```{r}
+patent_EU27 |>
+ ggplot(aes(x=Years, y=total_value)) +
+  geom_point() 
+```
+
+Similarely as before, if we only consider the 27 countries of the euro zone,
+we notice the same trend in the global number of patent.
+
+## Description of the data joining, cleaning, etc. for key indicator
+
+```{r}
+key_indicator |>
+   summarise(across(matches("^20|^19"), class))
+```
+
+We observe again that many of the columns contains characters that we have to 
+convert to numeric values. 
+
+```{r}
+key_indicator2 <- key_indicator |>
+  mutate(across(matches("^20|^19"), ~ as.numeric(.))) |> 
+  print(key_indicator2)
+```
+
+```{r}
+key_indicator2 |>
+  group_by(na_item) |>
+  select(sector)
+```
+
+Here we have a big problem because each sector has its own na_item that 
+correspond to the method of calculation. In other words, in each countries the 
+method to evaluate the percentage of each sector in the economy of the country 
+is different. This fact limits the rigor of the approach for any analysis based 
+on sectors.
+
+```{r}
+key_long <- key_indicator |>
+  pivot_longer(cols = starts_with("20"), names_to = "Years", values_to = "Value")
+print(key_long)
+```
+
+## Description of the data joining, cleaning,ect. for education
+
+```{r}
+education |>
+   summarise(across(matches("^20|^19"), class))
+
+```
+
+```{r}
+education2 <- education |>
+  mutate(across(matches("^20|^19"), ~ as.numeric(.))) |> 
+  print(education2)
+```
+
+```{r}
+education_long <- education |>
+  pivot_longer(cols = starts_with("20"), names_to = "Years", values_to = "Value")
+print(education_long)
+```
+
+## Patent and key indicator application
+
+## Patent and education application 
+
+
+
+
+
+
+
+
+## Description of the data joining, cleaning, etc. for combined data
+
+
+
 
 ```{r}
 #| echo: false
@@ -236,6 +364,32 @@ distinct() %>%
     educational_attainment == "ED5-8" ~ "Tertiary to Doctoral",
     TRUE ~ educational_attainment
   )) 
+```
+
+```{r}
+# First, let's identify which columns to keep
+combined_data %>%
+  names() %>%
+  print()
+
+# Then create a focused dataset
+focused_data <- combined_data %>%
+  # Select only relevant columns
+  select(
+    country,
+    educational_attainment,
+    sector,
+    coop_ptn,
+    matches("^20(1[2-9]|2[0-2])") # This keeps years 2013-2023
+  ) %>%
+  # Keep only the sectors and education levels relevant to patent analysis
+  filter(
+    sector %in% c("Total economy", "Non-financial corporations"),
+    !is.na(coop_ptn)
+  )
+
+# Check the dimensions of our new dataset
+dim(focused_data)
 ```
 
 ## Regression
@@ -310,30 +464,6 @@ library(car)
 vif(panel_model)
 ```
 
-### Education and patent application
-
-```{r}
-# Long data conversion
-long_data <- combined_data %>%
-  pivot_longer(cols = starts_with("20") & ends_with(".x"),  
-               names_to = "year", 
-               values_to = "value") %>%
-  mutate(year = as.numeric(year))
-```
-
-```{r}
-# Sample 10% of observations per year
-sampled_data <- long_data %>%
-  group_by(year) %>%                    # Group by year
-  sample_frac(0.1) %>%                   # Sample 10% of rows per year
-  ungroup()                             # Remove the grouping
-
-# Generate the plot with the sampled data
-ggplot(sampled_data, aes(x = educational_attainment, y = value, color = factor(year))) + 
-  geom_point(alpha = 0.1) + 
-  geom_smooth(method = "lm", formula = y ~ x, aes(group = year))
-```
-
 ### Differences between region (CEE ans WE)
 
 We will create two groups of countries to compare their innovation dynamics based on a study by Stojkoski et al. (2021), titled "Differences in innovation relationships between Central and Eastern Europe and Western Europe: Evidence from CIS 2014". 
@@ -395,74 +525,5 @@ ggplot(binned, aes(x = country_group, y = avg_patents)) +
   labs(title = "Average Patent Applications by Country Group", 
        x = "Country Group", y = "Average Patent Applications")
 ```
-
-
-## Description of the data joining, cleaning, etc. for patent
-
-```{r}
-patent |> summarise(across(starts_with("20"), class))
-```
-Here we find a problem in the patent dataset. Indeed, some Years have values in
-numeric format whereas some others are in the characters format 
-
-```{r}
-patent <- patent |>
-  mutate(across(starts_with("20"), ~ as.numeric(as.character(.))))  
-```
-Mutate() will let us modify existing columns starting with "20" and the function
-across() will spread to all the functions staring with "20" the change from
-numeric values to characters. 
-
-
-We first create a column with all the years in it and each country's
-values for every year:
-```{r}
-patent_long <- patent |>
-  pivot_longer(cols = starts_with("20"), names_to = "Years", values_to = "Value")
-print(patent_long)
-```
-
-
-```{r}
-patent_summary <- patent_long |>
-  filter(geo != "EU27_2020") |>
-  group_by(Years) |>
-    filter(!is.na(Value)) |>
-    mutate(total_value = sum(Value))
-print(patent_summary)
-```
-
-Here we add an additional filter to remove the mean of patent in every country
-in the euro zone (EU27_2020). We need to do that because otherwise some 
-countries in Europe will be counted two times (counted for themselves and inside
-the aggregate EU27_2020). 
-
-```{r}
-patent_summary |>
-ggplot(aes(x=Years, y=total_value)) +
-  geom_point()
-```
-
-We see a global trend of increasing the total number of patent each year in 
-the european countries. 
-
-```{r}
-patent_EU27 <- patent_long |>
-  filter(geo == "EU27_2020") |>
-  group_by(Years) |>
-    filter(!is.na(Value)) |>
-    mutate(total_value = sum(Value))
-print(patent_EU27)
-```
-
-
-```{r}
-patent_EU27 |>
- ggplot(aes(x=Years, y=total_value)) +
-  geom_point() 
-```
-
-Similarely as before, if we only consider the 27 countries of the euro zone,
-we notice the same trend in the global number of patent. 
 
 # IV- conclusion
