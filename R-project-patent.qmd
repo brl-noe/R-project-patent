@@ -517,33 +517,8 @@ combined_data <- combined_data %>%
 ### Panel regression & panel regression with lagged effect
 
 ```{r}
-# 4. Prepare for regression
-panel_data <- combined_data %>%
-  # Convert to long format
-  pivot_longer(
-    cols = matches("^\\d{4}$"),
-      names_to = "year",
-      values_to = "value"
-  ) %>%
-  # Impute missing values
-  mutate(
-    patent_count = as.numeric(coop_ptn),
-    patent_count = ifelse(is.na(patent_count), 0, patent_count),  # Example: Replace with 0
-    value = ifelse(is.na(value), mean(value, na.rm = TRUE), value)  # Replace with mean
-  )
-  # Convert year to numeric
-  mutate(year = as.numeric(year))
-```
-
-```{r}
-# 5. Run panel regression
-# We delete the duplicate
-panel_data <- panel_data[!duplicated(panel_data[c("country", "year")]), ]
-# We create pdata
-pdata <- pdata.frame(panel_data, index = c("country", "year"))
-
-panel_model <- plm(patent_count ~ educational_attainment + sector + value,
-                  data = pdata,
+panel_model <- plm(patents.x ~ educational_attainment + sector,
+                  data = combined_data,
                   index = c("country", "year"),
                   model = "within",
                   effect = "twoways")
@@ -580,7 +555,7 @@ library(car)
 vif(panel_model)
 ```
 
-### Differences between region (CEE ans WE)
+### Differences between region (CEE and WE)
 
 We will create two groups of countries to compare their innovation
 dynamics based on a study by Stojkoski et al. (2021), titled
