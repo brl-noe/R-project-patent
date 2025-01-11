@@ -270,11 +270,7 @@ key_indicator2 <- key_indicator |>
   print(key_indicator2)
 ```
 
-```{r}
-key_indicator2 |>
-  group_by(na_item) |>
-  select(sector)
-```
+
 
 Here we have a big problem because each sector has its own na_item that 
 correspond to the method of calculation. In other words, in each countries the 
@@ -283,10 +279,43 @@ is different. This fact limits the rigor of the approach for any analysis basedÂ
 onÂ sectors.
 
 ```{r}
+key_indicator2 |>
+  filter(geo == "FR") |>
+  ggplot(aes())
+```
+
+
+
+
+
+
+
+
+
+
+```{r}
 key_long <- key_indicator |>
   pivot_longer(cols = starts_with("20"), names_to = "Years", values_to = "Value")
 print(key_long)
 ```
+
+```{r}
+key_long |>
+  filter(geo == "FR") |>
+  filter(sector == "S11") |>
+  ggplot(aes(x = Years, y= Value, fill= sector)) +
+  geom_bar()
+```
+
+
+
+
+
+
+
+
+
+
 
 ## Description of the data joining, cleaning,ect. for education
 
@@ -310,7 +339,7 @@ print(education_long)
 
 ## Patent and key indicator application
 
-## Patent and education application 
+# Patent and education application 
 
 ```{r}
 prepare_data <- function(education_long, patent_long, start_year = 2012, end_year = 2022) {
@@ -349,6 +378,67 @@ prepare_data <- function(education_long, patent_long, start_year = 2012, end_yea
   return(merged_data)
 }
 ```
+
+# Patent and key indicator application 
+
+```{r}
+prepare_data <- function(key_long, patent_long, start_year = 2012, end_year = 2022) {
+  # Clean education data
+  clean_key <- key_long %>%
+    # Ensure `year` is numeric
+    mutate(year = as.numeric(Years),
+           # Map `sector` to their respective labels
+           sector = case_when(
+            sector == "S1" ~ "Total economy",
+            sector == "S11" ~ "Non-financial corporations",
+            sector == "S11_S12" ~ "Non-financial/financial corporate sectors",
+            sector == "S13" ~ "general government",
+            sector == "S14" ~ "Households",
+            sector == "S14_S15" ~ "Households and NPISHs",
+             TRUE ~ NA_character_  # Assign NA for unexpected values
+           )) %>%
+    # Filter years to reduce data volume
+    filter(year >= start_year, year <= end_year) %>%
+    # Remove rows with NA in key variables
+    filter(!is.na(sector), !is.na(geo)) %>%
+    # Optional: aggregate data (count or percentage representation)
+    group_by(geo, year, sector) %>%
+    summarize(sector = n(), .groups = "drop")
+
+  # Clean patent data
+  clean_key <- key_long %>%
+    # Ensure `year` is numeric
+    mutate(year = as.numeric(Years)) %>%
+    filter(year >= start_year, year <= end_year) %>%
+    filter(!is.na(Value), !is.na(geo)) %>%
+    group_by(geo, year) %>%
+    summarize(patents = sum(Value, na.rm = TRUE), .groups = "drop")
+
+  # Merge datasets
+  merged_data <- inner_join(clean_key, clean_patent, by = c("geo", "year"))
+  return(merged_data)
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ```{r}
 # Ensure merged_data is created by running the function
