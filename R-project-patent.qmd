@@ -114,6 +114,8 @@ different sectors and agents of the economy of the country.
 ## Loading the library
 #| message: false
 #| echo: false
+install.packages("conflicted", "here", "vroom","dplyr","ggplot2","tidyr","stringr", "tidyverse","plm","AER", "sandwich")
+library(conflicted)
 library(here)
 library(vroom)
 library(dplyr)
