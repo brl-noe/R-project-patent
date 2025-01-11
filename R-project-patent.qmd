@@ -312,16 +312,106 @@ print(education_long)
 
 ## Patent and education application 
 
+```{r}
+prepare_data <- function(education_long, patent_long, start_year = 2012, end_year = 2022) {
+  # Clean education data
+  clean_education <- education_long %>%
+    # Ensure `year` is numeric
+    mutate(year = as.numeric(Years),
+           # Map `isced11` to educational attainment levels
+           educational_attainment = case_when(
+             isced11 == "ED0-2" ~ "Lower secondary education",
+             isced11 == "ED3_4" ~ "Upper secondary education and Doctoral",
+             isced11 == "ED3_4GEN" ~ "Upper secondary (general)",
+             isced11 == "ED3_4VOC" ~ "Upper secondary (vocational)",
+             isced11 == "ED5-8" ~ "Tertiary to Doctoral",
+             TRUE ~ NA_character_  # Assign NA for unexpected values
+           )) %>%
+    # Filter years to reduce data volume
+    filter(year >= start_year, year <= end_year) %>%
+    # Remove rows with NA in key variables
+    filter(!is.na(educational_attainment), !is.na(geo)) %>%
+    # Optional: aggregate data (count or percentage representation)
+    group_by(geo, year, educational_attainment) %>%
+    summarize(educational_attainment_count = n(), .groups = "drop")
 
+  # Clean patent data
+  clean_patent <- patent_long %>%
+    # Ensure `year` is numeric
+    mutate(year = as.numeric(Years)) %>%
+    filter(year >= start_year, year <= end_year) %>%
+    filter(!is.na(Value), !is.na(geo)) %>%
+    group_by(geo, year) %>%
+    summarize(patents = sum(Value, na.rm = TRUE), .groups = "drop")
 
+  # Merge datasets
+  merged_data <- inner_join(clean_education, clean_patent, by = c("geo", "year"))
+  return(merged_data)
+}
+```
 
+```{r}
+filtered_data <- merged_data %>%
+  filter(geo %in% c("FR", "DE", "IT"))  # Replace with desired country codes
 
+plot_education_patents <- ggplot(filtered_data, 
+         aes(x = year, 
+             y = patents, 
+             color = educational_attainment, 
+             group = interaction(geo, educational_attainment))) +
+    geom_line(size = 1, alpha = 0.7) +
+    facet_wrap(~ geo, scales = "free_y") +
+    scale_color_viridis_d(name = "Education Level") +
+    theme_minimal() +
+    labs(x = "Year",
+         y = "Number of Patents",
+         title = "Patent Activity by Education Level and Country") +
+    theme(legend.position = "right",
+          plot.title = element_text(size = 14, face = "bold"),
+          strip.text = element_text(size = 10))
+print(plot_education_patents)
+```
 
+```{r}
+filtered_data <- merged_data %>%
+  filter(year == 2022, geo %in% c("FR", "DE", "IT", "EU27_2020"))
 
+plot_education_patents2 <- ggplot(filtered_data, 
+         aes(x = geo, 
+             y = patents, 
+             fill = educational_attainment)) +
+    geom_bar(stat = "identity", position = "dodge") +
+    scale_fill_viridis_d(name = "Education Level") +
+    theme_minimal() +
+    labs(x = "Country",
+         y = "Number of Patents",
+         title = "Patent Activity by Education Level and Country (2022)") +
+    theme(legend.position = "right",
+          plot.title = element_text(size = 14, face = "bold"),
+          axis.text.x = element_text(angle = 45, hjust = 1))
+print(plot_education_patents2)
+```
 
 ## Description of the data joining, cleaning, etc. for combined data
 
+```{r}
+education_long_agg <- education_long %>%
+  group_by(geo, Years) %>%
+  summarise()
 
+patent_long_agg <- patent_long %>%
+  group_by(geo, Years) %>%
+  summarise()
+
+key_long_agg <- key_long %>%
+  group_by(geo, Years) %>%
+  summarise()
+
+combined_data <- education_long_agg %>%
+  inner_join(patent_long_agg, by = c("geo", "Years")) %>%
+  inner_join(key_long_agg, by = c("geo", "Years"))
+
+```
 
 
 ```{r}
@@ -524,6 +614,39 @@ ggplot(binned, aes(x = country_group, y = avg_patents)) +
   theme_minimal() +
   labs(title = "Average Patent Applications by Country Group", 
        x = "Country Group", y = "Average Patent Applications")
+```
+
+### Data cleaning and merging 2
+
+## Cleaning each dataset separetaly
+
+```{r}
+# Since many of the columns for the years in the data set are considered as 
+# character values we have to arrange it 
+
+patent2 <- patent |>
+  mutate(across(starts_with("20"), ~ as.numeric(.))) 
+
+education2 <- education |>
+  mutate(across(matches("^20|^19"), ~ as.numeric(.))) 
+
+key_indicator2 <- key_indicator |>
+  mutate(across(matches("^20|^19"), ~ as.numeric(.))) 
+```
+
+## Merge them
+
+```{r}
+#| echo: false
+# 2. Join datasets
+combined_data2 <- education2 %>% 
+  left_join(key_indicator2, by = "geo", relationship = "many-to-many") %>%
+  left_join(patent, by = "geo", relationship = "many-to-many")
+```
+
+```{r}
+combined_data2 <- combined_data2 %>%
+  select(where(~ !all(is.na(.))))
 ```
 
 # IV- conclusion
