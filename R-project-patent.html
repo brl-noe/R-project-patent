@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.555">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>R-project-patent</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="R-project-patent_files/libs/clipboard/clipboard.min.js"></script>
+<script src="R-project-patent_files/libs/quarto-html/quarto.js"></script>
+<script src="R-project-patent_files/libs/quarto-html/popper.min.js"></script>
+<script src="R-project-patent_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="R-project-patent_files/libs/quarto-html/anchor.min.js"></script>
+<link href="R-project-patent_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="R-project-patent_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="R-project-patent_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="R-project-patent_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="R-project-patent_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="R-project-patent.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">R-project-patent</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>GitHub Repository <a href="https://github.com/brl-noe/R-project-patent.git" class="uri">https://github.com/brl-noe/R-project-patent.git</a></p>
+<section id="i--research-question-presentation" class="level1">
+<h1>I- Research question presentation</h1>
+<p>In early September, Mario Draghi revealed his plan to make the European Union more competitive. A key part of his plan is to invest billions in innovation. Patent applications serve as a proxy for innovation. A patent is an exclusive right granted for an invention, while a patent application refers to the legal and administrative process of requesting the issuance of a patent. This includes the content of the invention’s description and claims, along with the procedural paperwork involved. Therefore, it seems relevant to explore what factors influence the phenomenon of patent applications across European Union countries. Our research question is: <strong>What factors influence patent applications across European Union countries? A longitudinal analysis of education, innovation dynamics, and socioeconomic indicators.</strong></p>
+<p>This study focuses on the role of education, innovation-related factors, and socioeconomic variables in explaining differences in patent activity across EU countries. We aim to determine whether higher educational attainment correlates with more patents and how economic factors, such as GDP, income inequality, and unemployment, influence this relationship.</p>
+<p>Moreover, our study will employ a longitudinal analysis, allowing us to examine trends in patent applications and the evolution of the relationship between patent activity, education, and socioeconomic factors across European Union countries over time.We hypothesize that higher economic development is positively correlated with higher educational attainment and, in turn, with increased patent applications. In 2023, countries with the highest number of patent applications were also among the largest global economies (e.g., China ranked 1st, and the USA ranked 2nd), suggesting a link between economic strength and innovation output. This pattern implies that economic resources may facilitate investments in education and research, which are crucial drivers of technological advancement. Moreover, a World Bank article published in 2023 stated: <em>“Today, there is agreement that education, independent of innate ability, helps spur innovation and technology, and it contributes to productivity and economic growth.”</em> This further supports the idea that education plays a critical role in fostering innovation, reinforcing the need to investigate whether a similar relationship exists within European Union countries.</p>
+<p>Our findings could help European policymakers allocate resources more effectively, ensuring that the billions of euros invested in innovation contribute to the European Union’s goal of remaining globally competitive. For instance, if we find that higher educational attainment correlates with higher patent applications, we would recommend that policymakers prioritize investments in education. This would potentially be more impactful and cost-effective than investing in other areas of the R&amp;D process, such as infrastructure.</p>
+</section>
+<section id="ii--data-sets-descriptions" class="level1">
+<h1>II- Data sets descriptions</h1>
+<p>For our analysis, we will use tree different datasets all coming from the Eurostat public database: Population by Educational Attainment Level, Sex, and Age: <a href="https://ec.europa.eu/eurostat/web/products-datasets/-/edat_lfse_03" class="uri">https://ec.europa.eu/eurostat/web/products-datasets/-/edat_lfse_03</a> Patent Applications to the European Patent Office by Applicants’ / Inventors’ Country of Residence: <a href="https://ec.europa.eu/eurostat/web/products-datasets/-/sdg_09_40" class="uri">https://ec.europa.eu/eurostat/web/products-datasets/-/sdg_09_40</a> Key Indicators - Annual Data: <a href="https://ec.europa.eu/eurostat/web/products-datasets/-/nasa_10_ki" class="uri">https://ec.europa.eu/eurostat/web/products-datasets/-/nasa_10_ki</a></p>
+<p>The common key indicator of the 3 datasets is <code>geo</code> that refers to the name of the country. This variable will be useful to associate datasets with each other. Another common variable to the 3 datasets is <code>unit</code> (percentage or a row value of the observed variable).</p>
+<p>Then, the first dataset called patent has as observed value the number of requests for patent protection of an invention filed with the European Patent Office (EPO) regardless of whether they are granted or not. Here, we see a limit in our analysis coming from the last fact. Indeed, later on the analysis, we will proxy the level of innovation in a country based on this observed value of application for patent however we don’t actually know if the patent is granted or not, we mainly know which country (<code>geo</code>) applied for how many a patent each year.</p>
+<p>The second dataset called education contains mainly contains the variable <code>isced11</code>. <code>isced11</code> is an indication of the the educational attainment level of an individual with each individual being in between 15 and 64 years old (variable <code>age</code>). The educational attainment level corresponds to the highest ISCED (International Standard Classification of Education) level successfully completed, the successful completion of an education programme being validated by a recognised qualification, in other word a qualification officially recognised by the relevant national education authorities or recognised as equivalent to another qualification of formal education. The ISCED for 2011 are as following:</p>
+<p>Level 0 – Less than primary education Level 1 – Primary education Level 2 – Lower secondary education Level 3 – Upper secondary education Level 4 – Post-secondary non-tertiary education Level 5 – Short-cycle tertiary education Level 6 – Bachelor’s or equivalent level Level 7 – Master’s or equivalent level Level 8 – Doctoral or equivalent level</p>
+<p>The third dataset called key_indicator encompass non-financial accounts that provide a description of the different stages of the economic process (variable <code>na_item</code>): production, generation of income, distribution of income, redistribution of income, use of income and non-financial accumulation. These stages are estimated in percentage for different sectors and agents of the economy of the country.</p>
+<section id="basics-informations-about-the-databases" class="level2">
+<h2 class="anchored" data-anchor-id="basics-informations-about-the-databases">Basics informations about the databases</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Loading the library</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: le package 'here' a été compilé avec la version R 4.3.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>here() starts at C:/Users/noe2b/Documents/Dauphine/Data_management/R-project-patent</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(vroom)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: le package 'vroom' a été compilé avec la version R 4.3.3</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attachement du package : 'dplyr'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Les objets suivants sont masqués depuis 'package:stats':
+
+    filter, lag</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Les objets suivants sont masqués depuis 'package:base':
+
+    intersect, setdiff, setequal, union</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: le package 'ggplot2' a été compilé avec la version R 4.3.3</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_bw</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Loading the data</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>here<span class="sc">::</span><span class="fu">i_am</span>(<span class="st">"R-project-patent.Rproj"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>here() starts at C:/Users/noe2b/Documents/Dauphine/Data_management/R-project-patent</code></pre>
+</div>
+</div>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th>Patent</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Number of rows</td>
+<td>152</td>
+</tr>
+<tr class="even">
+<td>Number of columns</td>
+<td>21</td>
+</tr>
+</tbody>
+</table>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th>Key Indicator</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Number of rows</td>
+<td>682</td>
+</tr>
+<tr class="even">
+<td>Number of columns</td>
+<td>76</td>
+</tr>
+</tbody>
+</table>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th>Education</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Number of rows</td>
+<td>6714</td>
+</tr>
+<tr class="even">
+<td>Number of columns</td>
+<td>33</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="iii--data-analysis" class="level1">
+<h1>III- Data analysis</h1>
+<section id="description-of-the-data-joining-cleaning-etc." class="level2">
+<h2 class="anchored" data-anchor-id="description-of-the-data-joining-cleaning-etc.">Description of the data joining, cleaning, etc.</h2>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>    freq.x              sex                age               unit.x         
+ Length:471102      Length:471102      Length:471102      Length:471102     
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+                                                                            
+   isced11              geo               1992.x             1993.x         
+ Length:471102      Length:471102      Length:471102      Length:471102     
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+                                                                            
+    1994.x             1995.x             1996.x             1997.x         
+ Length:471102      Length:471102      Length:471102      Length:471102     
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+                                                                            
+    1998.x             1999.x             2000.x             2001.x         
+ Length:471102      Length:471102      Length:471102      Length:471102     
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+                                                                            
+    2002.x             2003.x             2004.x             2005.x         
+ Length:471102      Length:471102      Length:471102      Length:471102     
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+                                                                            
+    2006.x             2007.x             2008.x             2009.x         
+ Length:471102      Length:471102      Length:471102      Length:471102     
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+                                                                            
+    2010.x             2011.x             2012.x             2013.x         
+ Length:471102      Length:471102      Length:471102      Length:471102     
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+                                                                            
+    2014.x             2015.x             2016.x             2017.x         
+ Length:471102      Length:471102      Length:471102      Length:471102     
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+                                                                            
+    2018.x             2019.x             2020.x             2021.x         
+ Length:471102      Length:471102      Length:471102      Length:471102     
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+                                                                            
+    2022.x             2023.x             freq.y             unit.y         
+ Length:471102      Length:471102      Length:471102      Length:471102     
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+                                                                            
+   na_item             sector              1949               1950          
+ Length:471102      Length:471102      Length:471102      Length:471102     
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+                                                                            
+     1951               1952               1953               1954          
+ Length:471102      Length:471102      Length:471102      Length:471102     
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+                                                                            
+     1955               1956               1957               1958          
+ Length:471102      Length:471102      Length:471102      Length:471102     
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+                                                                            
+     1959               1960               1961               1962          
+ Length:471102      Length:471102      Length:471102      Length:471102     
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+                                                                            
+     1963               1964               1965               1966          
+ Length:471102      Length:471102      Length:471102      Length:471102     
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+                                                                            
+     1967               1968               1969               1970          
+ Length:471102      Length:471102      Length:471102      Length:471102     
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+                                                                            
+     1971               1972               1973               1974          
+ Length:471102      Length:471102      Length:471102      Length:471102     
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+                                                                            
+     1975               1976               1977               1978          
+ Length:471102      Length:471102      Length:471102      Length:471102     
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+                                                                            
+     1979               1980               1981               1982          
+ Length:471102      Length:471102      Length:471102      Length:471102     
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+                                                                            
+     1983               1984               1985               1986          
+ Length:471102      Length:471102      Length:471102      Length:471102     
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+                                                                            
+     1987               1988               1989               1990          
+ Length:471102      Length:471102      Length:471102      Length:471102     
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+                                                                            
+     1991              1992.y             1993.y             1994.y         
+ Length:471102      Length:471102      Length:471102      Length:471102     
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+                                                                            
+    1995.y             1996.y             1997.y             1998.y         
+ Length:471102      Length:471102      Length:471102      Length:471102     
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+                                                                            
+    1999.y             2000.y             2001.y             2002.y         
+ Length:471102      Length:471102      Length:471102      Length:471102     
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+                                                                            
+    2003.y             2004.y             2005.y             2006.y         
+ Length:471102      Length:471102      Length:471102      Length:471102     
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+                                                                            
+    2007.y             2008.y             2009.y             2010.y         
+ Length:471102      Length:471102      Length:471102      Length:471102     
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+                                                                            
+    2011.y             2012.y             2013.y             2014.y         
+ Length:471102      Length:471102      Length:471102      Length:471102     
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+                                                                            
+    2015.y             2016.y             2017.y             2018.y         
+ Length:471102      Length:471102      Length:471102      Length:471102     
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+                                                                            
+    2019.y             2020.y             2021.y             2022.y         
+ Length:471102      Length:471102      Length:471102      Length:471102     
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+                                                                            
+    2023.y              freq             coop_ptn             unit          
+ Length:471102      Length:471102      Length:471102      Length:471102     
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+                                                                            
+     2004               2005               2006               2007          
+ Length:471102      Length:471102      Length:471102      Length:471102     
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+                                                                            
+     2008               2009               2010               2011          
+ Length:471102      Length:471102      Length:471102      Length:471102     
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+                                                                            
+     2012                2013              2014               2015          
+ Length:471102      Min.   :    0.26   Length:471102      Length:471102     
+ Class :character   1st Qu.:   23.25   Class :character   Class :character  
+ Mode  :character   Median :  103.00   Mode  :character   Mode  :character  
+                    Mean   : 1825.31                                        
+                    3rd Qu.:  452.00                                        
+                    Max.   :61033.00                                        
+                    NA's   :5598                                            
+      2016              2017               2018               2019          
+ Min.   :    0.14   Length:471102      Length:471102      Length:471102     
+ 1st Qu.:   20.28   Class :character   Class :character   Class :character  
+ Median :  118.00   Mode  :character   Mode  :character   Mode  :character  
+ Mean   : 1885.25                                                           
+ 3rd Qu.:  556.00                                                           
+ Max.   :62998.00                                                           
+ NA's   :5598                                                               
+     2020               2021               2022               2023          
+ Length:471102      Length:471102      Length:471102      Length:471102     
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+                                                                            </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 140
+  freq.x   sex   age unit.x isced11   geo `1992.x` `1993.x` `1994.x` `1995.x`
+   &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;int&gt;   &lt;int&gt; &lt;int&gt;    &lt;int&gt;    &lt;int&gt;    &lt;int&gt;    &lt;int&gt;
+1      0     0     0      0       0     0        0        0        0        0
+# ℹ 130 more variables: `1996.x` &lt;int&gt;, `1997.x` &lt;int&gt;, `1998.x` &lt;int&gt;,
+#   `1999.x` &lt;int&gt;, `2000.x` &lt;int&gt;, `2001.x` &lt;int&gt;, `2002.x` &lt;int&gt;,
+#   `2003.x` &lt;int&gt;, `2004.x` &lt;int&gt;, `2005.x` &lt;int&gt;, `2006.x` &lt;int&gt;,
+#   `2007.x` &lt;int&gt;, `2008.x` &lt;int&gt;, `2009.x` &lt;int&gt;, `2010.x` &lt;int&gt;,
+#   `2011.x` &lt;int&gt;, `2012.x` &lt;int&gt;, `2013.x` &lt;int&gt;, `2014.x` &lt;int&gt;,
+#   `2015.x` &lt;int&gt;, `2016.x` &lt;int&gt;, `2017.x` &lt;int&gt;, `2018.x` &lt;int&gt;,
+#   `2019.x` &lt;int&gt;, `2020.x` &lt;int&gt;, `2021.x` &lt;int&gt;, `2022.x` &lt;int&gt;, …</code></pre>
+</div>
+</div>
+<section id="introduction-by-a-study-of-a-key-variable" class="level3">
+<h3 class="anchored" data-anchor-id="introduction-by-a-study-of-a-key-variable">Introduction by a study of a key variable</h3>
+<p>We first create a column with all the years in it and each country’s values for every year:</p>
+<p>Here we wanted to create a graph that shows the number of patent in function of the time. First we tried to use pivot_longer() to have one column with every year and each year is associated to a number of patent however even with trying different solutions, we didn’t get something satisfying. From our understanding the problem is coming from the fact that in the patent data set, some years are characters some others are numerical values. We tried to use as.numeric() and as.character() functions but it didn’t seem to give us a satisfying answer.</p>
+</section>
+</section>
+</section>
+<section id="iv--conclusion" class="level1">
+<h1>IV- conclusion</h1>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

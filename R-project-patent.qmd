@@ -235,7 +235,7 @@ distinct() %>%
     educational_attainment == "ED3_4VOC" ~ "Upper secondary (vocational)",
     educational_attainment == "ED5-8" ~ "Tertiary to Doctoral",
     TRUE ~ educational_attainment
-  ))
+  )) 
 ```
 
 ## Regression
@@ -310,7 +310,32 @@ library(car)
 vif(panel_model)
 ```
 
-### Fuzzy regression discontinuity 
+### Education and patent application
+
+```{r}
+# Long data conversion
+long_data <- combined_data %>%
+  pivot_longer(cols = starts_with("20") & ends_with(".x"),  
+               names_to = "year", 
+               values_to = "value") %>%
+  mutate(year = as.numeric(year))
+```
+
+```{r}
+# Sample 10% of observations per year
+sampled_data <- long_data %>%
+  group_by(year) %>%                    # Group by year
+  sample_frac(0.1) %>%                   # Sample 10% of rows per year
+  ungroup()                             # Remove the grouping
+
+# Generate the plot with the sampled data
+ggplot(sampled_data, aes(x = educational_attainment, y = value, color = factor(year))) + 
+  geom_point(alpha = 0.1) + 
+  geom_smooth(method = "lm", formula = y ~ x, aes(group = year))
+```
+
+### Differences between region (CEE ans WE)
+
 We will create two groups of countries to compare their innovation dynamics based on a study by Stojkoski et al. (2021), titled "Differences in innovation relationships between Central and Eastern Europe and Western Europe: Evidence from CIS 2014". 
 
 To replicate this approach and explore whether there's differences in the context of patent applications, we will group the countries as follows:
