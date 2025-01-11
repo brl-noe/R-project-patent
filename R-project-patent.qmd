@@ -299,7 +299,7 @@ numeric format whereas some others are in the characters format
 
 ```{r}
 patent <- patent |>
-  mutate(across(starts_with("20"), ~ as.numeric(as.character(.))))  
+  mutate(across(starts_with("20"), ~ as.numeric(.))) 
 ```
 Mutate() will let us modify existing columns starting with "20" and the function
 across() will spread to all the functions staring with "20" the change from
@@ -357,7 +357,7 @@ patent_EU27 |>
 Similarely as before, if we only consider the 27 countries of the euro zone,
 we notice the same trend in the global number of patent. 
 
-
+Commit for error message
 
 
 
