@@ -920,7 +920,9 @@ issues with model estimation.
 #### Chi-Squared Test on Sectoral Effects
 
 ```{r}
-
+#| message: false
+#| echo: false
+#| warning: false
 # Create a contingency table for the counts of patents across sectors
 sector_table <- table(merged_data2$sector, merged_data2$patents)
 
