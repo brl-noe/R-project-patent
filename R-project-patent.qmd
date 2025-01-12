@@ -1207,6 +1207,9 @@ Possible Causes:
 The Chow test could not provide a reliable conclusion regarding structural breaks due to these limitations. Further analysis with more balanced or scaled data would be required for a robust test.
 
 ```{r}
+#| message: false
+#| echo: false
+#| warning: false
 # Pooled model
 pooled_model <- lm(patents.x ~ educational_attainment + sector + year, data = vet)
 
