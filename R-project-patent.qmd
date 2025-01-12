@@ -154,7 +154,6 @@ library(plm)
 library(AER)
 library(sandwich)
 theme_set(theme_bw())
-library(png)
 conflicted::conflict_prefer("filter", "dplyr")
 ```
 
@@ -304,11 +303,11 @@ key_indicator |>
 We observe again that many of the columns contains characters that we
 have to convert to numeric values.
 
+
+
 ```{r}
-#| message: false
-#| echo: false
 key_indicator2 <- key_indicator |>
-  mutate(across(matches("^20|^19"), ~ as.numeric(.))) |> 
+  mutate(across(matches("^20|^19"), ~ as.numeric(.)))
   print(key_indicator2)
 ```
 
@@ -340,7 +339,7 @@ education |>
 #| message: false
 #| echo: false
 education2 <- education |>
-  mutate(across(matches("^20|^19"), ~ as.numeric(.))) |> 
+  mutate(across(matches("^20|^19"), ~ as.numeric(.))) 
   print(education2)
 ```
 
@@ -490,7 +489,6 @@ plot_education_patents2 <- ggplot(filtered_data,
     scale_y_continuous(expand = expansion(mult = c(0, 0.1))) 
 
 print(plot_education_patents2)
-
 ```
 
 
