@@ -170,9 +170,10 @@ education <- vroom(here("education.tsv"))
 # III- Data analysis
 
 ```{r}
-#| echo: false
 # Data cleaning steps
 # 1. Separate columns
+#| message: false
+#| echo: false
 education <- education %>%
   separate(col = "freq,sex,age,unit,isced11,geo\\TIME_PERIOD", 
            into = c("freq", "sex", "age", "unit", "isced11", "geo"),
@@ -187,9 +188,11 @@ key_indicator <- key_indicator %>%
            sep = ",")
 ```
 
-## Description of the data joining, cleaning, etc. for patent
+### Description of the data joining, cleaning, etc. for patent
 
 ```{r}
+#| message: false
+#| echo: false
 patent |> summarise(across(starts_with("20"), class))
 ```
 
@@ -198,6 +201,8 @@ values in numeric format whereas some others are in the characters
 format
 
 ```{r}
+#| message: false
+#| echo: false
 patent <- patent |>
   mutate(across(starts_with("20"), ~ as.numeric(as.character(.))))  
 ```
@@ -210,12 +215,16 @@ We first create a column with all the years in it and each country's
 values for every year:
 
 ```{r}
+#| message: false
+#| echo: false
 patent_long <- patent |>
   pivot_longer(cols = starts_with("20"), names_to = "Years", values_to = "Value")
 print(patent_long)
 ```
 
 ```{r}
+#| message: false
+#| echo: false
 patent_summary <- patent_long |>
   filter(geo != "EU27_2020") |>
   group_by(Years) |>
@@ -230,6 +239,8 @@ otherwise some countries in Europe will be counted two times (counted
 for themselves and inside the aggregate EU27_2020).
 
 ```{r}
+#| message: false
+#| echo: false
 patent_summary |>
 ggplot(aes(x=Years, y=total_value)) +
   geom_point()
@@ -239,6 +250,8 @@ We see a global trend of increasing the total number of patent each year
 in the european countries.
 
 ```{r}
+#| message: false
+#| echo: false
 patent_EU27 <- patent_long |>
   filter(geo == "EU27_2020") |>
   group_by(Years) |>
@@ -248,6 +261,8 @@ print(patent_EU27)
 ```
 
 ```{r}
+#| message: false
+#| echo: false
 patent_EU27 |>
  ggplot(aes(x=Years, y=total_value)) +
   geom_point() 
@@ -256,9 +271,11 @@ patent_EU27 |>
 Similarely as before, if we only consider the 27 countries of the euro
 zone, we notice the same trend in the global number of patent.
 
-## Description of the data joining, cleaning, etc. for key indicator
+### Description of the data joining, cleaning, etc. for key indicator
 
 ```{r}
+#| message: false
+#| echo: false
 key_indicator |>
    summarise(across(matches("^20|^19"), class))
 ```
@@ -267,6 +284,8 @@ We observe again that many of the columns contains characters that we
 have to convert to numeric values.
 
 ```{r}
+#| message: false
+#| echo: false
 key_indicator2 <- key_indicator |>
   mutate(across(matches("^20|^19"), ~ as.numeric(.))) |> 
   print(key_indicator2)
@@ -279,18 +298,26 @@ economy of the country is different. This fact limits the rigor of the
 approach for any analysis based  on sectors.
 
 ```{r}
+#| message: false
+#| echo: false
 key_indicator2 |>
   filter(geo == "FR") |>
   ggplot(aes())
 ```
 
+
 ```{r}
+#| message: false
+#| echo: false
 key_long <- key_indicator |>
   pivot_longer(cols = starts_with("20"), names_to = "Years", values_to = "Value")
 print(key_long)
 ```
 
+
 ```{r}
+#| message: false
+#| echo: false
 key_long |>
   filter(geo == "FR") |>
   filter(sector == "S11") |>
@@ -298,21 +325,26 @@ key_long |>
   geom_bar()
 ```
 
-## Description of the data joining, cleaning,ect. for education
+### Description of the data joining, cleaning,ect. for education
 
 ```{r}
+#| message: false
+#| echo: false
 education |>
    summarise(across(matches("^20|^19"), class))
-
 ```
 
 ```{r}
+#| message: false
+#| echo: false
 education2 <- education |>
   mutate(across(matches("^20|^19"), ~ as.numeric(.))) |> 
   print(education2)
 ```
 
 ```{r}
+#| message: false
+#| echo: false
 education_long <- education |>
   pivot_longer(cols = starts_with("20"), names_to = "Years", values_to = "Value")
 print(education_long)
@@ -321,6 +353,8 @@ print(education_long)
 # Patent and education application
 
 ```{r}
+#| message: false
+#| echo: false
 prepare_data <- function(education_long, patent_long, start_year = 2012, end_year = 2022) {
   # Clean education data
   clean_education <- education_long %>%
@@ -359,11 +393,15 @@ prepare_data <- function(education_long, patent_long, start_year = 2012, end_yea
 ```
 
 ```{r}
+#| message: false
+#| echo: false
 # Ensure merged_data is created by running the function
 merged_data <- prepare_data(education_long, patent_long)
 ```
 
 ```{r}
+#| message: false
+#| echo: false
 filtered_data <- merged_data %>%
   filter(geo %in% c("FR", "DE", "IT"))  # Replace with desired country codes
 
@@ -386,6 +424,8 @@ print(plot_education_patents)
 ```
 
 ```{r}
+#| message: false
+#| echo: false
 filtered_data <- merged_data %>%
   filter(year == 2022, geo %in% c("FR", "DE", "IT", "EU27_2020"))
 
@@ -408,6 +448,8 @@ print(plot_education_patents2)
 # Patent and key indicator application
 
 ```{r}
+#| message: false
+#| echo: false
 prepare_data2 <- function(key_long, patent_long, start_year = 2012, end_year = 2022) {
   # Clean education data
   clean_key <- key_long %>%
@@ -449,11 +491,15 @@ prepare_data2 <- function(key_long, patent_long, start_year = 2012, end_year = 2
 ```
 
 ```{r}
+#| message: false
+#| echo: false
 # Ensure merged_data is created by running the function
 merged_data2 <- prepare_data2(key_long, patent_long)
 ```
 
 ```{r}
+#| message: false
+#| echo: false
 filtered_data2 <- merged_data2 %>%
   filter(geo %in% c("FR", "DE", "IT"))  # Replace with desired country codes
 
@@ -476,6 +522,8 @@ print(plot_key_patents)
 ```
 
 ```{r}
+#| message: false
+#| echo: false
 filtered_data3 <- merged_data2 %>%
   filter(year == 2022, geo %in% c("FR", "DE", "IT", "EU27_2020"))
 
@@ -498,12 +546,15 @@ print(plot_key_patents3)
 ## Description of the data joining, cleaning, etc. for combined data
 
 ```{r}
+#| message: false
+#| echo: false
 combined_data <- merged_data %>%
   full_join(merged_data2, by = c("geo", "year"), relationship = "many-to-many") %>%
   dplyr::select(-patents.y)  # Ensure the correct select function is used
 ```
 
 ```{r}
+#| message: false
 #| echo: false
 # 3. Clean and prepare data
 combined_data <- combined_data %>%
@@ -518,6 +569,8 @@ combined_data <- combined_data %>%
 
 We wanted to do a panel data analysis but there's a huge issue with duplicates we weren't able to fixed. I put the code with #.  
 ```{r}
+#| message: false
+#| echo: false
 # First, let's check for duplicates
 duplicates_check <- combined_data %>%
   group_by(country, year) %>%
@@ -532,6 +585,8 @@ print(duplicates_check)
 ```
 
 ```{r}
+#| message: false
+#| echo: false
 # Basic panel model
 #panel_model <- plm(patents.x ~ educational_attainment + sector,data = panel_data,index = c("country", "year"),model = "within",effect = "twoways")
 ```
@@ -539,6 +594,8 @@ print(duplicates_check)
 ### Easier regression 
 
 ```{r}
+#| message: false
+#| echo: false
 # Prepare data - no need to handle duplicates
 model_data <- combined_data %>%
   mutate(
@@ -551,6 +608,8 @@ model_data <- combined_data %>%
 
 
 ```{r}
+#| message: false
+#| echo: false
 # Run fixed effects regression
 # This includes country and year fixed effects
 fe_model <- lm(patents.x ~ educational_attainment + sector + 
@@ -560,6 +619,8 @@ fe_model <- lm(patents.x ~ educational_attainment + sector +
 
 
 ```{r}
+#| message: false
+#| echo: false
 # Get robust standard errors clustered by country
 robust_se <- coeftest(fe_model, 
                      vcov = vcovCL, 
@@ -579,6 +640,8 @@ ggplot(data.frame(fitted = fitted(fe_model),
 
 
 ```{r}
+#| message: false
+#| echo: false
 # 2. Average patents by country over time
 avg_by_country_year <- model_data %>%
   group_by(country, year) %>%
@@ -597,6 +660,8 @@ ggplot(avg_by_country_year, aes(x = year, y = avg_patents, color = country)) +
 
 
 ```{r}
+#| message: false
+#| echo: false
 # Print results
 print("Fixed Effects Regression Results:")
 print(summary(fe_model))
@@ -606,6 +671,8 @@ print(robust_se)
 
 
 ```{r}
+#| message: false
+#| echo: false
 # Calculate R-squared
 r2 <- summary(fe_model)$r.squared
 adj_r2 <- summary(fe_model)$adj.r.squared
@@ -616,6 +683,8 @@ print(paste("Adjusted R-squared:", round(adj_r2, 3)))
 ```
 
 ```{r}
+#| message: false
+#| echo: false
 # We check for multicollinearity
 library(car)
 vif(fe_model)
@@ -638,6 +707,8 @@ Western Europe (WE): This group consists of Greece(EL), Spain(ES),
 Norway(NO), and Portugal(PT).
 
 ```{r}
+#| message: false
+#| echo: false
 vet <- combined_data
 # Prepare vet data
 vet <- vet %>%
@@ -656,6 +727,8 @@ vet <- vet %>%
 
 
 ```{r}
+#| message: false
+#| echo: false
 # Recode country codes
 conflicts_prefer(dplyr::recode)
 vet$country <- recode(
@@ -674,6 +747,8 @@ vet$country <- recode(
 
 
 ```{r}
+#| message: false
+#| echo: false
 # Load libraries and get European map data
 library(sf)
 library(rnaturalearth)
@@ -685,12 +760,16 @@ europe <- world[world$region_un == "Europe", ]
 
 
 ```{r}
+#| message: false
+#| echo: false
 # Merge map data with vet data
 europe_merged <- merge(europe, vet, by.x = "sov_a3", by.y = "country", all.x = TRUE)
 ```
 
 
 ```{r}
+#| message: false
+#| echo: false
 # Plot the map
 map_europe <- ggplot(data = europe_merged) +
   geom_sf(aes(fill = patents.x)) +
@@ -703,8 +782,8 @@ print(map_europe)
 ```
 
 ```{r}
-# Install necessary packages if you haven't already
-# install.packages("leaflet")
+#| message: false
+#| echo: false
 library(leaflet)
 library(sf)
 
@@ -712,11 +791,11 @@ library(sf)
 interactive_map <- leaflet(data = europe_merged) %>%
   addProviderTiles("CartoDB.Positron") %>%  # Add basemap
   addPolygons(
-    fillColor = ~viridis::viridis(1)[1],  # Use a color palette (customize as needed)
+    fillColor = ~viridis::viridis(1)[1],  # Use a color palette
     fillOpacity = 0.7,
     color = "black",  # Border color
     weight = 1,
-    popup = ~paste("Country:", name, "<br>Group:", patents.x)  # Customize the popup info
+    popup = ~paste("Country:", name, "<br>Group:", patents.x)
   )
 
 # Show the interactive map
@@ -724,9 +803,14 @@ print(interactive_map)
 
 ```
 
+We observe notable differences in patent applications between the two groups on the map. Specifically, Western European countries tend to have higher patent application rates compared to their counterparts in Central and Eastern Europe. To better understand these disparities, we will conduct a regression analysis to further explore the differences.
+
+
 #### Regression
 
 ```{r}
+#| message: false
+#| echo: false
 # Run separate regressions for each group
 western_reg <- lm(patents.x ~ educational_attainment + sector + year,
                  data = filter(vet, country_group == "WE"))
@@ -737,6 +821,8 @@ eastern_reg <- lm(patents.x ~ educational_attainment + sector + year,
 
 
 ```{r}
+#| message: false
+#| echo: false
 # Get robust standard errors for both models
 western_robust <- coeftest(western_reg, vcov = vcovHC(western_reg, type = "HC1"))
 eastern_robust <- coeftest(eastern_reg, vcov = vcovHC(eastern_reg, type = "HC1"))
@@ -744,6 +830,8 @@ eastern_robust <- coeftest(eastern_reg, vcov = vcovHC(eastern_reg, type = "HC1")
 
 
 ```{r}
+#| message: false
+#| echo: false
 library(dplyr)
 library(ggplot2)
 library(broom)
@@ -759,6 +847,8 @@ comparison_table <- bind_rows(western_results, eastern_results) %>%
 
 
 ```{r}
+#| message: false
+#| echo: false
 # Calculate summary statistics
 summary_stats <- vet %>%
   group_by(country_group) %>%
@@ -773,6 +863,8 @@ summary_stats <- vet %>%
 
 
 ```{r}
+#| message: false
+#| echo: false
 # Visualize predictions by group
 vet <- vet %>%
   mutate(
@@ -792,7 +884,10 @@ ggplot(vet, aes(x = as.numeric(year), y = patents.x, color = country_group)) +
     y = "Number of Patents",
     color = "Country Group"
   )
+```
 
+
+```{r}
 # Print results
 print("Western Countries Regression Results:")
 print(western_robust)
@@ -802,8 +897,30 @@ print("\nSummary Statistics:")
 print(summary_stats)
 ```
 
+We observe that, mean, sd, the R-squared of western is lower than the one of the eastern so the eastern countries patent application variation are more expalined by the variable sector and educational attainment (our model). However, there's 495 more observation in the central and eastern group than in the western group, this have effect on the R-squared, indeed, The group with more observations will likely have a more stable and robust R-squared value, while the smaller group might produce a less reliable one. So we need additional computation to conclude.
+We use a adjusted R-squarded becuase it's less sensitive to sample size differences and gives a more accurate measure of how well the model fits the data when comparing groups with unequal sample sizes.
 
 ```{r}
+# Get Adjusted R-squared for Western group
+adjusted_r_squared_western <- summary(western_reg)$adj.r.squared
+
+# Get Adjusted R-squared for Eastern group
+adjusted_r_squared_eastern <- summary(eastern_reg)$adj.r.squared
+
+# Print Adjusted R-squared values
+print(paste("Adjusted R-squared for Western group:", round(adjusted_r_squared_western, 4)))
+print(paste("Adjusted R-squared for Eastern group:", round(adjusted_r_squared_eastern, 4)))
+
+```
+Both groups have low Adjusted R-squared values, which suggests that the independent variables included in the model (educational attainment, sector, and year) do not explain much of the variance in patent applications.
+1.1% of the variance in patent applications in Western countries is explained by the variables in your model (educational attainment, sector, and year). For central and eastern countries it slighlty higher approximately 3.57% of the variance in patent applications in Eastern countries is explained by the same model.
+This may be due to the fact that patent applications are influenced by many other factors, such as policy environments, cultural factors, economic conditions, or innovation ecosystems, which are not captured by this model.
+
+Comparison between groups: While the Eastern group has a slightly higher Adjusted R-squared than the Western group, both values are quite low, so the difference is not substantial. It suggests that the independent variables explain similarly small portions of the variance in both groups, and the model might not be a strong predictor for either group.
+
+```{r}
+#| message: false
+#| echo: false
 # Chow test for structural break between groups
 # Combine the data and run pooled regression
 pooled_reg <- lm(patents.x ~ educational_attainment + sector + year,
@@ -833,6 +950,8 @@ print(paste("p-value:", round(p_value, 4)))
 ## Cleaning each dataset separetaly
 
 ```{r}
+#| message: false
+#| echo: false
 # Since many of the columns for the years in the data set are considered as 
 # character values we have to arrange it 
 
@@ -849,6 +968,7 @@ key_indicator2 <- key_indicator |>
 ## Merge them
 
 ```{r}
+#| message: false
 #| echo: false
 # 2. Join datasets
 combined_data2 <- education2 %>% 
@@ -857,6 +977,8 @@ combined_data2 <- education2 %>%
 ```
 
 ```{r}
+#| message: false
+#| echo: false
 combined_data2 <- combined_data2 %>%
   select(where(~ !all(is.na(.))))
 ```
