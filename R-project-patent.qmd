@@ -515,9 +515,6 @@ combined_data <- combined_data %>%
 ## Regression
 
 ### Panel regression & panel regression with lagged effect
-```{r}
-
-```
 
 We wanted to do a panel data analysis but there's a huge issue with duplicates we weren't able to fixed. I put the code with #.  
 ```{r}
@@ -538,6 +535,8 @@ print(duplicates_check)
 # Basic panel model
 #panel_model <- plm(patents.x ~ educational_attainment + sector,data = panel_data,index = c("country", "year"),model = "within",effect = "twoways")
 ```
+
+### Easier regression 
 
 ```{r}
 # Prepare data - no need to handle duplicates
@@ -616,23 +615,10 @@ print(paste("R-squared:", round(r2, 3)))
 print(paste("Adjusted R-squared:", round(adj_r2, 3)))
 ```
 
-
-```{r}
-# Basic model predictions
-model_data$predicted <- predict(fe_model)
-```
-
-
-```{r}
-# Calculate mean absolute error
-mae <- mean(abs(model_data$patents.x - model_data$predicted))
-print(paste("\nMean Absolute Error:", round(mae, 3)))
-```
-
 ```{r}
 # We check for multicollinearity
 library(car)
-vif(panel_model)
+vif(fe_model)
 ```
 
 ### Differences between region (CEE and WE)
