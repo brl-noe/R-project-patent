@@ -61,15 +61,13 @@ policymakers prioritize investments in education. This would potentially
 be more impactful and cost-effective than investing in other areas of
 the R&D process, such as infrastructure.
 
-<<<<<<< HEAD
 Useful table of abbreviations for countries :
 
 ```{r}
 
 ```
 
-=======
->>>>>>> c307024afbb32af990d29c3c8479ee25a1d9e05e
+
 # II- Data sets descriptions
 
 For our analysis, we will use tree different datasets all coming from
