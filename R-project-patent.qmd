@@ -317,6 +317,13 @@ countries the method to evaluate the percentage of each sector in the
 economy of the country is different. This fact limits the rigor of the
 approach for any analysis based on sectors.
 
+```{r}
+#| message: false
+#| echo: false
+key_long <- key_indicator |>
+  pivot_longer(cols = starts_with("20"), names_to = "Years", values_to = "Value")
+print(key_long)
+```
 
 
 ### Description of the data joining, cleaning,ect. for education
@@ -396,26 +403,64 @@ merged_data <- prepare_data(education_long, patent_long)
 ```{r}
 #| message: false
 #| echo: false
+# 1. Data Preparation - Filter for specific years
 filtered_data <- merged_data %>%
-  filter(geo %in% c("FR", "DE", "BG"))
+  filter(
+    geo %in% c("FR", "DE", "BG"),  # Selected countries
+    year %in% c(2012, 2015, 2018, 2021)  # Show only these years
+  )
 
-plot_education_patents <- ggplot(filtered_data, 
-         aes(x = year, 
-             y = patents, 
-             color = educational_attainment, 
-             group = interaction(geo, educational_attainment))) +
-    geom_line(size = 1, alpha = 0.7) +
-    facet_wrap(~ geo, scales = "free_y") +
-    scale_color_viridis_d(name = "Education Level") +
-    theme_minimal() +
-    labs(x = "Year",
-         y = "Number of Patents",
-         title = "Patent Activity by Education Level and Country") +
-    theme(legend.position = "right",
-          plot.title = element_text(size = 14, face = "bold"),
-          strip.text = element_text(size = 10))
+# 2. Create the plot
+plot_education_patents <- ggplot(
+  filtered_data, 
+  aes(
+    x = year, 
+    y = patents, 
+    color = educational_attainment,  # Different color for each education level
+    linetype = educational_attainment,  # Different line type for each education level
+    group = educational_attainment
+  )
+) +
+  # Add lines
+  geom_line(size = 1.2) +
+  # Add points to show exact values
+  geom_point(size = 3) +
+  # Separate by country
+  facet_wrap(
+    ~ geo, 
+    scales = "free_y",
+    labeller = labeller(geo = c(
+      "FR" = "France",
+      "DE" = "Germany",
+      "BG" = "Bulgaria"
+    ))
+  ) +
+  # Adjust scales for better visibility
+  scale_y_continuous(labels = scales::comma) +  # Add commas to numbers
+  scale_x_continuous(breaks = c(2012, 2015, 2018, 2021)) +  # Show only selected years
+  # Customize colors
+  scale_color_brewer(palette = "Set2") +
+  # Labels
+  labs(
+    x = "Year",
+    y = "Number of Patents",
+    title = "Patent Activity by Country",
+    color = "Education Level",
+    linetype = "Education Level"
+  ) +
+  # Theme customization
+  theme_minimal() +
+  theme(
+    legend.position = "bottom",  # Move legend to bottom
+    plot.title = element_text(size = 14, face = "bold"),
+    strip.text = element_text(size = 12, face = "bold"),  # Country names
+    axis.text.x = element_text(angle = 0)  # Horizontal year labels
+  )
+
+# 3. Display the plot
 print(plot_education_patents)
 ```
+
 
 ```{r}
 #| message: false
@@ -521,28 +566,64 @@ merged_data2 <- prepare_data2(key_long, patent_long)
 ```
 
 ```{r}
-#| message: false
-#| echo: false
+# 1. Data Preparation - Filter for specific years
 filtered_data2 <- merged_data2 %>%
-  filter(geo %in% c("FR", "DE", "BG"))  # Replace with desired country codes
+  filter(
+    geo %in% c("FR", "DE", "BG"),  # Selected countries
+    year %in% c(2012, 2015, 2018, 2021)  # Show only these years
+  )
 
-plot_key_patents <- ggplot(filtered_data2, 
-         aes(x = year, 
-             y = patents, 
-             color = sector, 
-             group = interaction(geo, sector))) +
-    geom_line(size = 1, alpha = 0.7) +
-    facet_wrap(~ geo, scales = "free_y") +
-    scale_color_viridis_d(name = "Sector") +
-    theme_minimal() +
-    labs(x = "Year",
-         y = "Number of Patents",
-         title = "Patent Activity by Sector and Country") +
-    theme(legend.position = "right",
-          plot.title = element_text(size = 14, face = "bold"),
-          strip.text = element_text(size = 10))
+# 2. Create the plot
+plot_key_patents <- ggplot(
+  filtered_data2, 
+  aes(
+    x = year, 
+    y = patents, 
+    color = sector,  # Different color for each sector
+    linetype = sector,  # Different line type for each sector
+    group = sector
+  )
+) +
+  # Add lines
+  geom_line(size = 1.2) +
+  # Add points to show exact values
+  geom_point(size = 3) +
+  # Separate by country
+  facet_wrap(
+    ~ geo, 
+    scales = "free_y",
+    labeller = labeller(geo = c(
+      "FR" = "France",
+      "DE" = "Germany",
+      "BG" = "Bulgaria"
+    ))
+  ) +
+  # Adjust scales for better visibility
+  scale_y_continuous(labels = scales::comma) +  # Add commas to numbers
+  scale_x_continuous(breaks = c(2012, 2015, 2018, 2021)) +  # Show only selected years
+  # Customize colors
+  scale_color_brewer(palette = "Set2") +
+  # Labels
+  labs(
+    x = "Year",
+    y = "Number of Patents",
+    title = "Patent Activity by Country",
+    color = "Sector",
+    linetype = "Sector"
+  ) +
+  # Theme customization
+  theme_minimal() +
+  theme(
+    legend.position = "bottom",  # Move legend to bottom
+    plot.title = element_text(size = 14, face = "bold"),
+    strip.text = element_text(size = 12, face = "bold"),  # Country names
+    axis.text.x = element_text(angle = 0)  # Horizontal year labels
+  )
+
+# 3. Display the plot
 print(plot_key_patents)
 ```
+
 
 ```{r}
 #| message: false
