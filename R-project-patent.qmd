@@ -827,6 +827,7 @@ p <- ggplot(avg_by_country_year, aes(x = year, y = avg_patents, color = country,
 print(p)
 
 ```
+Over time, the average number of patents per country appears to be increasing. This trend is reflected by the EU27_2020 (largest points on the graph), which shows a consistent upward trajectory. However, some countries, such as Germany (the second-largest on the graph), display a relatively constant average number of patents between 2012 and 2022, indicating little variation in their patent activity during this period. 
 
 ```{r}
 #| message: false
