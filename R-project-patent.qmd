@@ -61,6 +61,12 @@ policymakers prioritize investments in education. This would potentially
 be more impactful and cost-effective than investing in other areas of
 the R&D process, such as infrastructure.
 
+Useful table of abbreviations for countries :
+
+![](images/clipboard-3399964864.png)
+
+![](images/clipboard-192549785.png){width="410"}
+
 # II- Data sets descriptions
 
 For our analysis, we will use tree different datasets all coming from
@@ -305,7 +311,6 @@ key_indicator2 |>
   ggplot(aes())
 ```
 
-
 ```{r}
 #| message: false
 #| echo: false
@@ -313,7 +318,6 @@ key_long <- key_indicator |>
   pivot_longer(cols = starts_with("20"), names_to = "Years", values_to = "Value")
 print(key_long)
 ```
-
 
 ```{r}
 #| message: false
@@ -545,7 +549,9 @@ print(plot_key_patents3)
 
 ## Description of the data joining, cleaning, etc. for combined data
 
-We merged the 2 dataset we create earlier by their common variables: geo and country. And then we rename a column for clarity: country=geo
+We merged the 2 dataset we create earlier by their common variables: geo
+and country. And then we rename a column for clarity: country=geo
+
 ```{r}
 #| message: false
 #| echo: false
@@ -568,7 +574,9 @@ combined_data <- combined_data %>%
 
 ### Panel regression & panel regression with lagged effect
 
-We wanted to do a panel data analysis but there's a huge issue with duplicates we weren't able to fixed. I put the code with #.  
+We wanted to do a panel data analysis but there's a huge issue with
+duplicates we weren't able to fixed. I put the code with #.
+
 ```{r}
 #| message: false
 #| echo: false
@@ -592,7 +600,7 @@ print(duplicates_check)
 #panel_model <- plm(patents.x ~ educational_attainment + sector,data = panel_data,index = c("country", "year"),model = "within",effect = "twoways")
 ```
 
-### Easier regression 
+### Easier regression
 
 ```{r}
 #| message: false
@@ -607,7 +615,6 @@ model_data <- combined_data %>%
   )
 ```
 
-
 ```{r}
 #| message: false
 #| echo: false
@@ -617,7 +624,6 @@ fe_model <- lm(patents.x ~ educational_attainment + sector +
                country + year,  # Country and year fixed effects
                data = model_data)
 ```
-
 
 ```{r}
 #| message: false
@@ -639,10 +645,19 @@ ggplot(data.frame(fitted = fitted(fe_model),
        y = "Residuals")
 ```
 
-In the graph above, the x-axis shows the fitted (predicted) values from the regression model, the y-axis shows the residuals (the differences between observed and predicted values) and the red dashed line represents zero on the residuals scale.
-We observe that most residuals are clustered around the zero line for lower fitted values (left side), which is good. However, there appears to be increasing spread and some extreme residuals as the fitted values increase (right side).
-Moreover, there's evidence of heteroscedasticity (non-constant variance) since the spread of residuals isn't consistent across fitted values. The spread appears to increase with larger fitted values.
-The pattern suggests that the model might be: - Performing better for smaller values, - Less reliable for larger values, - Potentially missing some important non-linear relationships
+In the graph above, the x-axis shows the fitted (predicted) values from
+the regression model, the y-axis shows the residuals (the differences
+between observed and predicted values) and the red dashed line
+represents zero on the residuals scale. We observe that most residuals
+are clustered around the zero line for lower fitted values (left side),
+which is good. However, there appears to be increasing spread and some
+extreme residuals as the fitted values increase (right side). Moreover,
+there's evidence of heteroscedasticity (non-constant variance) since the
+spread of residuals isn't consistent across fitted values. The spread
+appears to increase with larger fitted values. The pattern suggests that
+the model might be: - Performing better for smaller values, - Less
+reliable for larger values, - Potentially missing some important
+non-linear relationships
 
 ```{r}
 #| message: false
@@ -663,7 +678,6 @@ ggplot(avg_by_country_year, aes(x = year, y = avg_patents, color = country)) +
        y = "Average Patents")
 ```
 
-
 ```{r}
 #| message: false
 #| echo: false
@@ -674,30 +688,41 @@ print("\nRobust Standard Errors (Clustered by Country):")
 print(robust_se)
 ```
 
-Surprisingly, we observe that educational attainment levels show minimal and statistically insignificant effects on patent applications. For example:
-  Tertiary to Doctoral Education
-  Coefficient: 8.670e-11 (extremely small positive effect)
-  Marginal significance (p = 0.071)
-  This suggests that for each percentage point increase in the population with tertiary to doctoral        education, there is virtually no measurable impact on patent applications
-This unexpected result suggests that the relationship between education and patents might be more complex than directly measurable, possibly operating through other channels or requiring different measurement approaches. Indeed there 3 possible things that can explain this result: 
-  1) Scale Issue: The variables might need rescaling (e.g., education in percentages while patents in absolute numbers)
-  2) Model Specification: The relationship might be non-linear or requiring interaction terms
-  3) Data Structure: The strong country fixed effects might be absorbing most of the education-related variance
-  
-In fact, There are substantial and highly significant differences between countries in patent applications:
-Leading innovators: Germany (+48,064), France (+16,096), Switzerland (+9,169), Netherlands (+8,387)
-Lower patent activity: Many Eastern European countries show significantly negative coefficients, indicating structural differences in innovation systems
-These large country effects suggest that national innovation systems, institutional quality, and industrial base may be more important than educational metrics alone.
+Surprisingly, we observe that educational attainment levels show minimal
+and statistically insignificant effects on patent applications. For
+example: Tertiary to Doctoral Education Coefficient: 8.670e-11
+(extremely small positive effect) Marginal significance (p = 0.071) This
+suggests that for each percentage point increase in the population with
+tertiary to doctoral education, there is virtually no measurable impact
+on patent applications This unexpected result suggests that the
+relationship between education and patents might be more complex than
+directly measurable, possibly operating through other channels or
+requiring different measurement approaches. Indeed there 3 possible
+things that can explain this result: 1) Scale Issue: The variables might
+need rescaling (e.g., education in percentages while patents in absolute
+numbers) 2) Model Specification: The relationship might be non-linear or
+requiring interaction terms 3) Data Structure: The strong country fixed
+effects might be absorbing most of the education-related variance
 
-Furthermore, we observe clear upward trend in patent applications over time:
-  Significant positive year effects from 2017-2022
-  Strongest effects in recent years (2021: +1,027, 2022: +993)
-  This suggests improving innovation capacity across Europe over time
+In fact, There are substantial and highly significant differences
+between countries in patent applications: Leading innovators: Germany
+(+48,064), France (+16,096), Switzerland (+9,169), Netherlands (+8,387)
+Lower patent activity: Many Eastern European countries show
+significantly negative coefficients, indicating structural differences
+in innovation systems These large country effects suggest that national
+innovation systems, institutional quality, and industrial base may be
+more important than educational metrics alone.
 
-Finally, there's a sector effect, we observe significant differences across sectors:
-Non-financial corporations show significant negative effects while Household sector shows significant positive effects
-This indicates the importance of considering institutional structures in innovation.
+Furthermore, we observe clear upward trend in patent applications over
+time: Significant positive year effects from 2017-2022 Strongest effects
+in recent years (2021: +1,027, 2022: +993) This suggests improving
+innovation capacity across Europe over time
 
+Finally, there's a sector effect, we observe significant differences
+across sectors: Non-financial corporations show significant negative
+effects while Household sector shows significant positive effects This
+indicates the importance of considering institutional structures in
+innovation.
 
 ```{r}
 #| message: false
@@ -711,8 +736,16 @@ print(paste("R-squared:", round(r2, 3)))
 print(paste("Adjusted R-squared:", round(adj_r2, 3)))
 ```
 
-We have a R-squared: 0.998 which mean that 99.8% of the variance in patent applications is explained by the independent variables in the model (educational attainment, sector, and year). The model is a very good fit for the data. Almost all the variation in the outcome variable (patent applications) is being explained by the predictors we have included.
-Moreover, since R-squared and Adjusted R-squared are the same, this suggests that you are not overfitting the model. It means that the model’s explanatory power is due to the actual relationship between the independent variables and the dependent variable, rather than just adding more predictors for the sake of increasing the R-squared.
+We have a R-squared: 0.998 which mean that 99.8% of the variance in
+patent applications is explained by the independent variables in the
+model (educational attainment, sector, and year). The model is a very
+good fit for the data. Almost all the variation in the outcome variable
+(patent applications) is being explained by the predictors we have
+included. Moreover, since R-squared and Adjusted R-squared are the same,
+this suggests that you are not overfitting the model. It means that the
+model’s explanatory power is due to the actual relationship between the
+independent variables and the dependent variable, rather than just
+adding more predictors for the sake of increasing the R-squared.
 
 ```{r}
 #| message: false
@@ -722,7 +755,15 @@ library(car)
 vif(fe_model)
 ```
 
-The GVIF and GVIF^(1/(2*Df)) values are all very close to 1, with only minor exceptions for sector and country, which have GVIF values slightly above 1. These small values suggest that multicollinearity is not a major concern in your model.The absence of large GVIF values (i.e., values much greater than 1) indicates that multicollinearity is not severe, and the regression coefficients should be reliable.The slight inflation observed for sector and country indicates minor correlations with other variables, but these are not likely to cause significant issues with model estimation.
+The GVIF and GVIF\^(1/(2\*Df)) values are all very close to 1, with only
+minor exceptions for sector and country, which have GVIF values slightly
+above 1. These small values suggest that multicollinearity is not a
+major concern in your model.The absence of large GVIF values (i.e.,
+values much greater than 1) indicates that multicollinearity is not
+severe, and the regression coefficients should be reliable.The slight
+inflation observed for sector and country indicates minor correlations
+with other variables, but these are not likely to cause significant
+issues with model estimation.
 
 ### Differences between region (CEE and WE)
 
@@ -731,7 +772,9 @@ dynamics based on a study by Stojkoski et al. (2021), titled
 "Differences in innovation relationships between Central and Eastern
 Europe and Western Europe: Evidence from CIS 2014".
 
-To replicate this approach and explore further the differences between countries we observe in the regression, we will group the countries as follows:
+To replicate this approach and explore further the differences between
+countries we observe in the regression, we will group the countries as
+follows:
 
 Central and Eastern Europe (CEE): This group includes countries such as
 Bulgaria (BG), Croatia (HR), Hungary(HU), Romania(RO), and Slovakia(SK).
@@ -757,7 +800,6 @@ vet <- vet %>%
   )
 ```
 
-
 ```{r}
 #| message: false
 #| echo: false
@@ -777,7 +819,6 @@ vet$country <- recode(
 )
 ```
 
-
 ```{r}
 #| message: false
 #| echo: false
@@ -790,14 +831,12 @@ world <- ne_countries(scale = "medium", returnclass = "sf")
 europe <- world[world$region_un == "Europe", ]
 ```
 
-
 ```{r}
 #| message: false
 #| echo: false
 # Merge map data with vet data
 europe_merged <- merge(europe, vet, by.x = "sov_a3", by.y = "country", all.x = TRUE)
 ```
-
 
 ```{r}
 #| message: false
@@ -835,8 +874,11 @@ print(interactive_map)
 
 ```
 
-We observe notable differences in patent applications between the two groups on the map. Specifically, Western European countries tend to have higher patent application rates compared to their counterparts in Central and Eastern Europe. To better understand these disparities, we will conduct a regression analysis to further explore the differences.
-
+We observe notable differences in patent applications between the two
+groups on the map. Specifically, Western European countries tend to have
+higher patent application rates compared to their counterparts in
+Central and Eastern Europe. To better understand these disparities, we
+will conduct a regression analysis to further explore the differences.
 
 #### Regression
 
@@ -851,7 +893,6 @@ eastern_reg <- lm(patents.x ~ educational_attainment + sector + year,
                  data = filter(vet, country_group == "CEE"))
 ```
 
-
 ```{r}
 #| message: false
 #| echo: false
@@ -859,7 +900,6 @@ eastern_reg <- lm(patents.x ~ educational_attainment + sector + year,
 western_robust <- coeftest(western_reg, vcov = vcovHC(western_reg, type = "HC1"))
 eastern_robust <- coeftest(eastern_reg, vcov = vcovHC(eastern_reg, type = "HC1"))
 ```
-
 
 ```{r}
 #| message: false
@@ -877,7 +917,6 @@ comparison_table <- bind_rows(western_results, eastern_results) %>%
   arrange(term, group)
 ```
 
-
 ```{r}
 #| message: false
 #| echo: false
@@ -892,7 +931,6 @@ summary_stats <- vet %>%
     r_squared_eastern = summary(eastern_reg)$r.squared
   )
 ```
-
 
 ```{r}
 #| message: false
@@ -918,7 +956,6 @@ ggplot(vet, aes(x = as.numeric(year), y = patents.x, color = country_group)) +
   )
 ```
 
-
 ```{r}
 # Print results
 print("Western Countries Regression Results:")
@@ -929,8 +966,17 @@ print("\nSummary Statistics:")
 print(summary_stats)
 ```
 
-We observe that, mean, sd, the R-squared of western is lower than the one of the eastern so the eastern countries patent application variation are more expalined by the variable sector and educational attainment (our model). However, there's 495 more observation in the central and eastern group than in the western group, this have effect on the R-squared, indeed, The group with more observations will likely have a more stable and robust R-squared value, while the smaller group might produce a less reliable one. So we need additional computation to conclude.
-We use a adjusted R-squarded becuase it's less sensitive to sample size differences and gives a more accurate measure of how well the model fits the data when comparing groups with unequal sample sizes.
+We observe that, mean, sd, the R-squared of western is lower than the
+one of the eastern so the eastern countries patent application variation
+are more expalined by the variable sector and educational attainment
+(our model). However, there's 495 more observation in the central and
+eastern group than in the western group, this have effect on the
+R-squared, indeed, The group with more observations will likely have a
+more stable and robust R-squared value, while the smaller group might
+produce a less reliable one. So we need additional computation to
+conclude. We use a adjusted R-squarded becuase it's less sensitive to
+sample size differences and gives a more accurate measure of how well
+the model fits the data when comparing groups with unequal sample sizes.
 
 ```{r}
 # Get Adjusted R-squared for Western group
@@ -944,11 +990,25 @@ print(paste("Adjusted R-squared for Western group:", round(adjusted_r_squared_we
 print(paste("Adjusted R-squared for Eastern group:", round(adjusted_r_squared_eastern, 4)))
 
 ```
-Both groups have low Adjusted R-squared values, which suggests that the independent variables included in the model (educational attainment, sector, and year) do not explain much of the variance in patent applications.
-1.1% of the variance in patent applications in Western countries is explained by the variables in your model (educational attainment, sector, and year). For central and eastern countries it slighlty higher approximately 3.57% of the variance in patent applications in Eastern countries is explained by the same model.
-This may be due to the fact that patent applications are influenced by many other factors, such as policy environments, cultural factors, economic conditions, or innovation ecosystems, which are not captured by this model.
 
-Comparison between groups: While the Eastern group has a slightly higher Adjusted R-squared than the Western group, both values are quite low, so the difference is not substantial. It suggests that the independent variables explain similarly small portions of the variance in both groups, and the model might not be a strong predictor for either group.
+Both groups have low Adjusted R-squared values, which suggests that the
+independent variables included in the model (educational attainment,
+sector, and year) do not explain much of the variance in patent
+applications. 1.1% of the variance in patent applications in Western
+countries is explained by the variables in your model (educational
+attainment, sector, and year). For central and eastern countries it
+slighlty higher approximately 3.57% of the variance in patent
+applications in Eastern countries is explained by the same model. This
+may be due to the fact that patent applications are influenced by many
+other factors, such as policy environments, cultural factors, economic
+conditions, or innovation ecosystems, which are not captured by this
+model.
+
+Comparison between groups: While the Eastern group has a slightly higher
+Adjusted R-squared than the Western group, both values are quite low, so
+the difference is not substantial. It suggests that the independent
+variables explain similarly small portions of the variance in both
+groups, and the model might not be a strong predictor for either group.
 
 ```{r}
 #| message: false
@@ -977,42 +1037,6 @@ print(paste("F-statistic:", round(f_stat, 4)))
 print(paste("p-value:", round(p_value, 4)))
 ```
 
-### Data cleaning and merging 2
 
-## Cleaning each dataset separetaly
-
-```{r}
-#| message: false
-#| echo: false
-# Since many of the columns for the years in the data set are considered as 
-# character values we have to arrange it 
-
-patent2 <- patent |>
-  mutate(across(starts_with("20"), ~ as.numeric(.))) 
-
-education2 <- education |>
-  mutate(across(matches("^20|^19"), ~ as.numeric(.))) 
-
-key_indicator2 <- key_indicator |>
-  mutate(across(matches("^20|^19"), ~ as.numeric(.))) 
-```
-
-## Merge them
-
-```{r}
-#| message: false
-#| echo: false
-# 2. Join datasets
-combined_data2 <- education2 %>% 
-  left_join(key_indicator2, by = "geo", relationship = "many-to-many") %>%
-  left_join(patent, by = "geo", relationship = "many-to-many")
-```
-
-```{r}
-#| message: false
-#| echo: false
-combined_data2 <- combined_data2 %>%
-  select(where(~ !all(is.na(.))))
-```
 
 # IV- conclusion
