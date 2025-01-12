@@ -298,9 +298,9 @@ have to convert to numeric values.
 ```{r}
 #| message: false
 #| echo: false
-key_indicator2 <- key_indicator |>
+key_indicator <- key_indicator |>
   mutate(across(matches("^20|^19"), ~ as.numeric(.))) |> 
-  print(key_indicator2)
+  print(key_indicator)
 ```
 
 Here we have a big problem because each sector has its own na_item that
