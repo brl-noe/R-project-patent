@@ -63,7 +63,7 @@ the R&D process, such as infrastructure.
 
 # II- Data sets descriptions
 
-For our analysis, we will use tree different datasets all coming from
+For our analysis, we will use 3 different datasets all coming from
 the Eurostat public database: Population by Educational Attainment
 Level, Sex, and Age:
 <https://ec.europa.eu/eurostat/web/products-datasets/-/edat_lfse_03>
@@ -130,7 +130,17 @@ image_data <- readPNG("Table2.png")
 plot(1:2, type = "n", xlab = "", ylab = "", main = "Table2.png")  
 rasterImage(image_data, 1, 1, 2, 2) 
 ```
-## Preliminary packages installation, library opening and data loading
+### Preliminary packages installation, library opening and data loading
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+install.packages(c("conflicted", "here", "vroom", "dplyr", "ggplot2", "tidyr", "stringr", 
+                   "tidyverse", "plm", "AER", "sandwich", "sf", "rnaturalearth", 
+                   "rnaturalearthdata", "lmtest", "broom", "leaflet", "car", "viridis","png"))
+```
 
 
 ```{r}
@@ -353,7 +363,7 @@ education |>
 Same as education we notice that every values in each columns are in the 
 character format, there not considered as values. 
 
-
+## B- Patent and education application
 ```{r}
 #| message: false
 #| echo: false
@@ -497,7 +507,7 @@ Let's take France and Bulgaria for example.
 
 #### Education analysis
 
-## Education preparation
+#### Education preparation
 These codes will be useful later:
 
 ```{r}
@@ -551,7 +561,7 @@ prepare_data <- function(education_long, patent_long, start_year = 2012, end_yea
 merged_data <- prepare_data(education_long,patent_long)
 ```
 
-## Education attainment graphical analysis
+#### Education attainment graphical analysis
 
 We first clean the data and filter to take countries we're interested in 
 ```{r}
@@ -1040,8 +1050,6 @@ inflation observed for sector and country indicates minor correlations
 with other variables, but these are not likely to cause significant
 issues with model estimation.
 
-
-### Differences between region (CEE and WE)
 
 #### Chi-Squared Test on Sectoral Effects
 
