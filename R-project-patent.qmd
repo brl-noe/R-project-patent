@@ -61,12 +61,6 @@ policymakers prioritize investments in education. This would potentially
 be more impactful and cost-effective than investing in other areas of
 the R&D process, such as infrastructure.
 
-Useful table of abbreviations for countries :
-
-![](images/clipboard-3399964864.png)
-
-![](images/clipboard-192549785.png){width="410"}
-
 # II- Data sets descriptions
 
 For our analysis, we will use tree different datasets all coming from
@@ -306,27 +300,9 @@ approach for any analysis based  on sectors.
 ```{r}
 #| message: false
 #| echo: false
-key_indicator2 |>
-  filter(geo == "FR") |>
-  ggplot(aes())
-```
-
-```{r}
-#| message: false
-#| echo: false
 key_long <- key_indicator |>
   pivot_longer(cols = starts_with("20"), names_to = "Years", values_to = "Value")
 print(key_long)
-```
-
-```{r}
-#| message: false
-#| echo: false
-key_long |>
-  filter(geo == "FR") |>
-  filter(sector == "S11") |>
-  ggplot(aes(x = Years, y= Value, fill= sector)) +
-  geom_bar()
 ```
 
 ### Description of the data joining, cleaning,ect. for education
@@ -1036,7 +1012,5 @@ print("\nChow Test Results:")
 print(paste("F-statistic:", round(f_stat, 4)))
 print(paste("p-value:", round(p_value, 4)))
 ```
-
-
 
 # IV- conclusion
