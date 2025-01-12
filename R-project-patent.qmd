@@ -58,13 +58,9 @@ contribute to the European Union's goal of remaining globally
 competitive. For instance, if we find that higher educational attainment
 correlates with higher patent applications, we would recommend that
 policymakers prioritize investments in education. This would potentially
-be more impactful and cost-effective than investing in other areas of
+be more impactul and cost-effective than investing in other areas of
 the R&D process, such as infrastructure.
 
-<<<<<<< HEAD
-
-=======
->>>>>>> eb3095dfa91cd4f3a627655b0f26d6afe442069d
 # II- Data sets descriptions
 
 For our analysis, we will use tree different datasets all coming from
@@ -134,8 +130,8 @@ image_data <- readPNG("Table2.png")
 plot(1:2, type = "n", xlab = "", ylab = "", main = "Table2.png")  
 rasterImage(image_data, 1, 1, 2, 2) 
 ```
+## Preliminary packages installation, library opening and data loading
 
-## Basics informations about the databases
 
 ```{r}
 ## Loading the library
@@ -153,9 +149,12 @@ library(tidyverse)
 library(plm)
 library(AER)
 library(sandwich)
+library(viridis)
 theme_set(theme_bw())
 conflicted::conflict_prefer("filter", "dplyr")
 ```
+
+
 
 ```{r}
 #| message: false
@@ -170,6 +169,9 @@ key_indicator <- vroom(here("key_indicator.tsv"))
 ## Loading education data
 education <- vroom(here("education.tsv"))
 ```
+
+
+## Basics informations about the databases
 
 |                   | Patent           |
 |-------------------|------------------|
@@ -300,7 +302,7 @@ patent_EU27 |>
 Similarly as before, if we only consider the 27 countries of the euro
 zone, we notice the same trend in the global number of patent.
 
-#### Key indicator
+#### Key indicator dataset problem and long format
 
 ```{r}
 #| message: false
@@ -310,9 +312,8 @@ key_indicator |>
    summarise(across(matches("^20|^19"), class))
 ```
 
-We observe again that many of the columns contains characters that we
-have to convert to numeric values.
-
+In our dataset, we again observe that many of the columns contains characters 
+that we have to convert to numeric values.
 
 
 ```{r}
@@ -326,9 +327,9 @@ key_indicator2 <- key_indicator |>
 
 Here we have a big problem because each sector has its own na_item that
 correspond to the method of calculation. In other words, in each
-countries the method to evaluate the percentage of each sector in the
-economy of the country is different. This fact limits the rigor of the
-approach for any analysis based on sectors.
+country the method to evaluate the percentage of each sector in its global
+economy is different. This fact limits the rigor of our analysis based on 
+sectors.
 
 ```{r}
 #| message: false
@@ -340,7 +341,7 @@ print(key_long)
 ```
 
 
-#### Education
+#### Education dataset problem and long format
 
 ```{r}
 #| message: false
@@ -349,15 +350,9 @@ print(key_long)
 education |>
    summarise(across(matches("^20|^19"), class))
 ```
+Same as education we notice that every values in each columns are in the 
+character format, there not considered as values. 
 
-```{r}
-#| message: false
-#| echo: false
-#| warning: false
-education2 <- education |>
-  mutate(across(matches("^20|^19"), ~ as.numeric(.))) 
-  print(education2)
-```
 
 ```{r}
 #| message: false
@@ -368,13 +363,13 @@ education_long <- education |>
 print(education_long)
 ```
 
-<<<<<<< HEAD
 
-# Patent and education application
-=======
+##### Patent and education application
+
 ## B- Patent and education application
->>>>>>> eb3095dfa91cd4f3a627655b0f26d6afe442069d
 
+The following operation is needed to label, clean and merge the dataset with
+eachothers :
 ```{r}
 #| message: false
 #| echo: false
@@ -424,6 +419,9 @@ prepare_data <- function(education_long, patent_long, start_year = 2012, end_yea
 # Ensure merged_data is created by running the function
 merged_data <- prepare_data(education_long, patent_long)
 ```
+
+
+## Patent activity graphical analysis
 
 ```{r}
 #| message: false
@@ -498,7 +496,7 @@ another variable to take in consideration which is the education attainment.
 Let's take France and Bulgaria for example. 
 
 
-# Education graphical analysis
+## Education attainment graphical analysis
 
 We first clean the data and filter to take countries we're interested in 
 ```{r}
@@ -509,7 +507,7 @@ education_analysis <- education |>
 print(education_analysis)
 ```
 
-Then we label the education attainements :
+Then we label the education attainments :
 ```{r}
 education_analysis <- education_analysis |>
   mutate(isced11 = case_when(
@@ -556,20 +554,19 @@ education_analysis |>
 ```
 
 ```{r}
-<<<<<<< HEAD
 education_analysis |>
-  filter(geo == "BG") |>  # Changer "FR" par "BG" pour la Bulgarie
+  filter(geo == "BG") |>  
   pivot_longer(
     cols = starts_with("19") | starts_with("20"), 
     names_to = "Years", 
     values_to = "Value"
   ) |>
   mutate(
-    Years = as.numeric(Years),           # Transformer les valeurs de Years en format numérique 
-    Value = as.numeric(Value)            # Même chose pour Value
+    Years = as.numeric(Years),           
+    Value = as.numeric(Value)            
   ) |>
   group_by(Years) |>
-  mutate(Proportion = Value / sum(Value, na.rm = TRUE)) |>  # Proportion par niveau d'éducation par année
+  mutate(Proportion = Value / sum(Value, na.rm = TRUE)) |>  
   ggplot(aes(x = Years, y = Proportion, fill = isced11)) +
   geom_bar(stat = "identity", position = "stack") +  
   scale_fill_viridis_d(name = "Education Level") +  
@@ -589,75 +586,34 @@ education_analysis |>
 ```
 
 
-If we compare the two countries we notice a difference especially in the 
+If we compare the two countries, we notice a difference especially in the 
 "Tertiary to Doctoral" education level. The proportion of high educated citizens
 can explain with the economy wealth of the country the differences in number
 of patent each year. Basically, if a country have more doctoral student it is 
-more likely that this will have patent than an other. 
-=======
-#| message: false
-#| echo: false
-#| warning: false
-library(viridis)
->>>>>>> eb3095dfa91cd4f3a627655b0f26d6afe442069d
+more likely that this country will have more patent than an other. 
 
-# Sector graphical analysis 
 
-<<<<<<< HEAD
+## Sector graphical analysis 
 
 ```{r}
 key_indicator2 <- key_indicator |>
   mutate(sector = case_when(
-=======
-plot_education_patents2 <- ggplot(filtered_data, 
-         aes(x = geo, 
-             y = patents, 
-             fill = educational_attainment)) +
-    geom_bar(stat = "identity", position = "stack", width = 0.7, color = "black") +  # Adjust the borders of the sitcks
-    geom_text(aes(label = paste0(round(proportion, 1), "%")), 
-              position = position_stack(vjust = 0.5), size = 3) +  
-    scale_fill_viridis_d(name = "Education Level", option = "C") +  
-    theme_minimal() +
-    labs(x = "Country",
-         y = "Number of Patents",
-         title = "Patent Activity by Education Level and Country (2022)") +
-    theme(legend.position = "right",
-          plot.title = element_text(size = 14, face = "bold"),
-          axis.text.x = element_text(angle = 45, hjust = 1)) +
-    scale_y_continuous(expand = expansion(mult = c(0, 0.1))) 
-
-print(plot_education_patents2)
-```
-
-
-## C-Patent and key indicator application
-
-```{r}
-#| message: false
-#| echo: false
-#| warning: false
-prepare_data2 <- function(key_long, patent_long, start_year = 2012, end_year = 2022) {
-  # Clean education data
-  clean_key <- key_long %>%
-    # Ensure `year` is numeric
-    mutate(year = as.numeric(Years),
-           # Map `sector` to their respective labels
-           sector = case_when(
->>>>>>> eb3095dfa91cd4f3a627655b0f26d6afe442069d
              sector == "S1" ~ "Total economy",
              sector == "S11" ~ "Non-financial corporations",
              sector == "S11_S12" ~ "Non-financial/financial corporate sectors",
-             sector == "S13" ~ "general government",
+             sector == "S13" ~ "General government",
              sector == "S14" ~ "Households",
              sector == "S14_S15" ~ "Households and NPISHs",
              TRUE ~ sector  
            ))
 ```
 
+
+
+
 ```{r}
-<<<<<<< HEAD
 sector_analysis <- key_indicator2 |>
-  filter(sector != "Total economy") |> # For 
+  filter(sector != "Total economy") |>  # Exclure le secteur "Total economy"
   filter(!is.na(sector)) |>  # Supprimer les valeurs NA pour éviter les problèmes
   filter(geo %in% c("FR", "DE", "BG")) |>  # Filtrer pour France, Allemagne et Bulgarie
   select(where(~ all(!is.na(.)))) |>  # Conserver uniquement les colonnes sans NA
@@ -672,70 +628,12 @@ sector_analysis <- key_indicator2 |>
   ) |>
   group_by(geo, Years) |>  # Regrouper par pays et années
   mutate(Proportion = Value / sum(Value, na.rm = TRUE))  # Calculer les proportions par secteur par pays et par année
+
 ggplot(sector_analysis, aes(x = Years, y = Proportion, fill = sector)) +
   geom_bar(stat = "identity", position = "stack") +
   facet_wrap(~geo, scales = "free_x", nrow = 1) +  # Facettes pour chaque pays, une seule ligne
   scale_fill_viridis_d(name = "Sector") +  # Palette de couleurs
   scale_x_continuous(breaks = seq(1980, 2020, by = 10)) +  # Limite les intervalles de l'axe X
-=======
-#| message: false
-#| echo: false
-#| warning: false
-# Ensure merged_data is created by running the function
-merged_data2 <- prepare_data2(key_long, patent_long)
-```
-
-```{r}
-#| message: false
-#| echo: false
-#| warning: false
-# 1. Data Preparation - Filter for specific years
-filtered_data2 <- merged_data2 %>%
-  filter(
-    geo %in% c("FR", "DE", "BG"),  # Selected countries
-    year %in% c(2012, 2015, 2018, 2021)  # Show only these years
-  )
-
-# 2. Create the plot
-plot_key_patents <- ggplot(
-  filtered_data2, 
-  aes(
-    x = year, 
-    y = patents, 
-    color = sector,  # Different color for each sector
-    linetype = sector,  # Different line type for each sector
-    group = sector
-  )
-) +
-  # Add lines
-  geom_line(size = 1.2) +
-  # Add points to show exact values
-  geom_point(size = 3) +
-  # Separate by country
-  facet_wrap(
-    ~ geo, 
-    scales = "free_y",
-    labeller = labeller(geo = c(
-      "FR" = "France",
-      "DE" = "Germany",
-      "BG" = "Bulgaria"
-    ))
-  ) +
-  # Adjust scales for better visibility
-  scale_y_continuous(labels = scales::comma) +  # Add commas to numbers
-  scale_x_continuous(breaks = c(2012, 2015, 2018, 2021)) +  # Show only selected years
-  # Customize colors
-  scale_color_brewer(palette = "Set2") +
-  # Labels
-  labs(
-    x = "Year",
-    y = "Number of Patents",
-    title = "Patent Activity by Country",
-    color = "Sector",
-    linetype = "Sector"
-  ) +
-  # Theme customization
->>>>>>> eb3095dfa91cd4f3a627655b0f26d6afe442069d
   theme_minimal() +
   labs(
     title = "Share of Sectors in Patent Activity (France, Germany, Bulgaria)",
@@ -750,74 +648,23 @@ plot_key_patents <- ggplot(
     legend.text = element_text(size = 10),  # Texte de légende plus grand
     strip.text = element_text(size = 12, face = "bold")  # Titres des facettes plus clairs
   )
-
 ```
-As we can see on the graph, our data is not as clean as wished however we still
-can see the role of each sector for patent. In western Europe countries we 
-notice the importance of governments and Households Non-profit institutions 
-serving households (NPISH). Since, France and Germany have more patent over the
-years than Bulgaria, it seems that the more patent governments and Households 
-and NPISHs have a role in the economy, the more patent you get. 
-
-```{r}
-#| message: false
-#| echo: false
-#| warning: false
-library(viridis)
-
-filtered_data3 <- merged_data2 %>%
-    group_by(geo) %>%
-    mutate(proportion = patents / sum(patents) * 100)  # add the proportion in percentage
-
-plot_key_patents2 <- ggplot(filtered_data3, 
-         aes(x = geo, 
-             y = patents, 
-             fill = sector)) +
-    geom_bar(stat = "identity", position = "stack", width = 0.7) +  # Adjust the borders of the sitcks
-    geom_text(aes(label = paste0(round(proportion, 1), "%")), 
-              position = position_stack(vjust = 0.5), size = 3) +  
-    scale_fill_viridis_d(name = "Sector", option = "C") +  
-    theme_minimal() +
-    labs(x = "Country",
-         y = "Number of Patents",
-         title = "Patent Activity by Sector and Country (2022)") +
-    theme(legend.position = "right",
-          plot.title = element_text(size = 14, face = "bold"),
-          axis.text.x = element_text(angle = 45, hjust = 1)) +
-    scale_y_continuous(expand = expansion(mult = c(0, 0.1))) 
-
-print(plot_key_patents2)
-```
+As we can see on the charts, the dataset are not as clean as whished however we can
+still have a remark on each countries economy. We previously saw that western
+europe countries tends to have more patents than Bulgaria for example. And in 
+these countries  the Households and Non-profit institutions serving 
+households(NPISH) and Government have a big role in the global economy of 
+the country. We might explain this difference by the fact that government can
+push research and invest more for this purpose whereas in Bulgaria the 
+non-financial corporations are in majority and they do not necessarily aim to
+invest in research. We will later in this paper have an economtric analysis of 
+the variable sector. 
 
 
-<<<<<<< HEAD
 ## Description of the data joining, cleaning, etc. for combined data
-=======
-```{r}
-#| message: false
-#| echo: false
-#| warning: false
-filtered_data3 <- merged_data2 %>%
-  filter(year == 2022, geo %in% c("FR", "DE", "BG", "EU27_2020"))
 
-plot_key_patents3 <- ggplot(filtered_data3, 
-         aes(x = geo, 
-             y = patents, 
-             fill = sector)) +
-    geom_bar(stat = "identity", position = "dodge") +
-    scale_fill_viridis_d(name = "Education Level") +
-    theme_minimal() +
-    labs(x = "Country",
-         y = "Number of Patents",
-         title = "Patent Activity by Sector and Country (2022)") +
-    theme(legend.position = "right",
-          plot.title = element_text(size = 14, face = "bold"),
-          axis.text.x = element_text(angle = 45, hjust = 1))
-print(plot_key_patents3)
-```
 
 ### Combined data
->>>>>>> eb3095dfa91cd4f3a627655b0f26d6afe442069d
 
 We merged the 2 dataset we create earlier by their common variables: geo
 and country. And then we rename a column for clarity: country=geo
@@ -1146,7 +993,7 @@ vet$country <- recode(
   "PT" = "PRT"
 )
 ```
-## Maps 
+### Maps Preparation 
 
 ```{r}
 #| message: false
@@ -1188,7 +1035,7 @@ print(map_europe)
 ```
 
 
-# Interactive Maps 
+# Interactive Maps (could be long to charge)
 
 ```{r}
 #| message: false
@@ -1213,9 +1060,9 @@ print(interactive_map)
 
 ```
 
-We observe notable differences in patent applications between the two
-groups on the map. Specifically, Western European countries tend to have
-higher patent application rates compared to their counterparts in
+As mentioned previously, we observe notable differences in patent applications 
+between the two groups on the map. Specifically, Western European countries 
+tend to have higher patent application rates compared to their counterparts in
 Central and Eastern Europe. To better understand these disparities, we
 will conduct a regression analysis to further explore the differences.
 
@@ -1388,14 +1235,21 @@ print(paste("F-statistic:", round(f_stat, 4)))
 print(paste("p-value:", round(p_value, 4)))
 ```
 
-The Chow test was conducted to assess potential structural breaks between the "Western" and "Eastern" country groups. However, the results indicate potential issues:
+The Chow test was conducted to assess potential structural breaks between the 
+"Western" and "Eastern" country groups. However, the results indicate potential 
+issues:
 
-The calculated F-statistic is negative (F=−3365.676), which is not meaningful in this context. This suggests a problem with the test setup or the underlying data.
+The calculated F-statistic is negative (F=−3365.676), which is not meaningful in
+this context. This suggests a problem with the test setup or the underlying data.
 The p-value is not calculable (p=NaN), further confirming issues in the analysis.
 Possible Causes:
-  Scaling Issues: The pooled regression includes significantly more observations than the group-specific regressions, leading to discrepancies in residual sum of squares (RSS) comparisons.
-  Data Imbalance: Unequal group sizes may have caused instability in the calculation of the Chow test statistic.
-The Chow test could not provide a reliable conclusion regarding structural breaks due to these limitations. Further analysis with more balanced or scaled data would be required for a robust test.
+Scaling Issues: The pooled regression includes significantly more observations
+than the group-specific regressions, leading to discrepancies in residual sum of 
+squares (RSS) comparisons. Data Imbalance: Unequal group sizes may have caused 
+instability in the calculation of the Chow test statistic.
+The Chow test could not provide a reliable conclusion regarding structural breaks
+due to these limitations. Further analysis with more balanced or scaled data
+would be required for a robust test.
 
 ```{r}
 #| message: false
@@ -1413,10 +1267,75 @@ anova(pooled_model, segmented_model)
 
 ```
 
-To examine whether the relationship between educational attainment and patents differs across country groups, we compared two regression models using a likelihood ratio test.
-Model 1 included educational attainment, sector, and year as predictors of patents.
-Model 2 expanded on Model 1 by incorporating interaction terms between educational attainment and country group, allowing the effect of educational attainment to vary across country groups.
-The likelihood ratio test indicated that Model 2 provides a significantly better fit to the data (F-statistic = 148.26, p-value < 2.2e-16). The inclusion of the interaction terms led to a substantial reduction in the residual sum of squares (RSS), suggesting that the relationship between educational attainment and patents differs across country groups.
+To examine whether the relationship between educational attainment and patents 
+differs across country groups, we compared two regression models using a 
+likelihood ratio test. Model 1 included educational attainment, sector, and year 
+as predictors of patents.Model 2 expanded on Model 1 by incorporating 
+interaction terms between educational attainment and country group, allowing the
+effect of educational attainment to vary across country groups.
+The likelihood ratio test indicated that Model 2 provides a significantly better
+fit to the data (F-statistic = 148.26, p-value < 2.2e-16). The inclusion of the 
+interaction terms led to a substantial reduction in the residual sum of squares 
+(RSS), suggesting that the relationship between educational attainment and 
+patents differs across country groups.
 
 
 # IV- conclusion
+
+Our study examined the factors influencing patent applications across European 
+Union countries, focusing on the role of education, socioeconomic indicators, 
+and innovation dynamics through a longitudinal analysis from 2012 to 2022. The 
+results indicate that while educational attainment levels contribute to patent 
+activity, the relationship is more nuanced than initially hypothesized.
+
+Surprisingly, tertiary and doctoral education showed only marginal effects on 
+patent applications. This result suggests the influence of education might 
+operate through more complex or indirect ways that require further exploration
+of factors such as industry-specific R&D investments or institutional frameworks.
+
+Economic development emerged as a stronger determinant, with leading innovators 
+like Germany and France showcasing consistently higher patent activity. Eastern 
+European countries demonstrated lower patent activity, highlighting structural 
+differences in innovation ecosystems between Central and Eastern Europe (CEE) 
+and Western Europe (WE).
+
+Additionally, we found significant sectoral effects, with households playing a 
+more substantial role in patenting activity compared to non-financial 
+corporations. The upward trend in patent applications, particularly after 2017, 
+reflects the growing innovation capacity across the EU. It also highlights
+the importance of sustained investment in education and economic infrastructure.
+
+From a policy perspective, these findings suggest a need for targeted strategies
+that consider regional and sectoral variations. Investing in education alone may
+not be enough. Indeed, supports for innovation ecosystems and industry-specific 
+initiatives are necessary to help equitable growth in patent activity across 
+European countries.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
