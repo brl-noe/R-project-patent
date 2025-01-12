@@ -1015,6 +1015,8 @@ cat("RSS Eastern:", rss_eastern, "\n")
 The residual some of square for western countries is: 9300486501 and for central and eastern european countries is: 63183986.
 
 ```{r}
+#| message: false
+#| echo: false
 f_stat <- ((rss_pooled - (rss_western + rss_eastern)) / k) / 
           ((rss_western + rss_eastern) / (n1 + n2 - 2*k))
 
@@ -1034,5 +1036,25 @@ There's two possible reason for this issue:
   2) Data Imbalance: Unequal group sizes may have caused instability in the calculation of the Chow test statistic.
 That's the reason why The Chow test could not provide a reliable conclusion regarding structural breaks due to these limitations. Further analysis with more balanced or scaled data would be required for a robust test.
 
+#### Likelihood ratio test
+
+```{r}
+# Pooled model
+pooled_model <- lm(patents.x ~ educational_attainment + sector + year, data = vet)
+
+# Segmented model with group distinction
+segmented_model <- lm(patents.x ~ educational_attainment * country_group + 
+                      sector + year, data = vet)
+
+# Perform the likelihood ratio test
+anova(pooled_model, segmented_model)
+
+```
+
+To examine whether the relationship between educational attainment and patents differs across country groups, we compared two regression models using a likelihood ratio test.
+
+Model 1 included educational attainment, sector, and year as predictors of patents.
+Model 2 expanded on Model 1 by incorporating interaction terms between educational attainment and country group, allowing the effect of educational attainment to vary across country groups.
+The likelihood ratio test indicated that Model 2 provides a significantly better fit to the data (F-statistic = 148.26, p-value < 2.2e-16). The inclusion of the interaction terms led to a substantial reduction in the residual sum of squares (RSS), suggesting that the relationship between educational attainment and patents differs across country groups.
 
 # IV- conclusion
