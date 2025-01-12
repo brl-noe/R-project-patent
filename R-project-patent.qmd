@@ -204,7 +204,9 @@ key_indicator <- key_indicator %>%
            sep = ",")
 ```
 
-### Description of the data joining, cleaning, etc. for patent
+##  A- Description of the data joining, cleaning, etc. 
+
+#### Patent
 
 ```{r}
 #| message: false
@@ -294,7 +296,7 @@ patent_EU27 |>
 Similarly as before, if we only consider the 27 countries of the euro
 zone, we notice the same trend in the global number of patent.
 
-### Description of the data joining, cleaning, etc. for key indicator
+#### Key indicator
 
 ```{r}
 #| message: false
@@ -334,7 +336,7 @@ print(key_long)
 ```
 
 
-### Description of the data joining, cleaning,ect. for education
+#### Education
 
 ```{r}
 #| message: false
@@ -362,7 +364,7 @@ education_long <- education |>
 print(education_long)
 ```
 
-# Patent and education application
+## B- Patent and education application
 
 ```{r}
 #| message: false
@@ -507,7 +509,7 @@ print(plot_education_patents2)
 ```
 
 
-# Patent and key indicator application
+## C-Patent and key indicator application
 
 ```{r}
 #| message: false
@@ -677,7 +679,7 @@ plot_key_patents3 <- ggplot(filtered_data3,
 print(plot_key_patents3)
 ```
 
-## Description of the data joining, cleaning, etc. for combined data
+### Combined data
 
 We merged the 2 dataset we create earlier by their common variables: geo
 and country. And then we rename a column for clarity: country=geo
@@ -702,9 +704,9 @@ combined_data <- combined_data %>%
 )
 ```
 
-## Regression
+## D- Regression
 
-### Panel regression & panel regression with lagged effect
+#### Panel regression & panel regression with lagged effect
 
 We wanted to do a panel data analysis but there's a huge issue with
 duplicates we weren't able to fixed. I put the code with #.
@@ -731,7 +733,7 @@ print(duplicates_check)
 #panel_model <- plm(patents.x ~ educational_attainment + sector,data = panel_data,index = c("country", "year"),model = "within",effect = "twoways")
 ```
 
-### Easier regression
+#### Easier regression
 
 ```{r}
 #| message: false
@@ -945,7 +947,7 @@ if (chi_test$p.value < 0.05) {
 ```
 
 
-### Differences between region (CEE and WE)
+## E- Differences between region (CEE and WE)
 
 We will create two groups of countries to compare their innovation
 dynamics based on a study by Stojkoski et al. (2021), titled
