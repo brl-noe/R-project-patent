@@ -495,6 +495,61 @@ to the economic status of the countries. That could be true however we have
 another variable to take in consideration which is the education attainment. 
 Let's take France and Bulgaria for example. 
 
+#### Education analysis
+
+## Education preparation
+These codes will be useful later:
+
+```{r}
+#| message: false
+#| echo: false
+#| warning: false
+prepare_data <- function(education_long, patent_long, start_year = 2012, end_year = 2022) {
+  # Clean education data
+  clean_education <- education_long %>%
+    # Ensure year is numeric
+    mutate(year = as.numeric(Years),
+           # Map isced11 to educational attainment levels
+           educational_attainment = case_when(
+             isced11 == "ED0-2" ~ "Lower secondary education",
+             isced11 == "ED3_4" ~ "Upper secondary education and Doctoral",
+             isced11 == "ED3_4GEN" ~ "Upper secondary (general)",
+             isced11 == "ED3_4VOC" ~ "Upper secondary (vocational)",
+             isced11 == "ED5-8" ~ "Tertiary to Doctoral",
+             TRUE ~ NA_character_  # Assign NA for unexpected values
+           )) %>%
+    # Filter years to reduce data volume
+    filter(year >= start_year, year <= end_year) %>%
+    # Remove rows with NA in key variables
+    filter(!is.na(educational_attainment), !is.na(geo)) %>%
+    # Optional: aggregate data (count or percentage representation)
+    group_by(geo, year, educational_attainment) %>%
+    summarize(educational_attainment_count = n(), .groups = "drop")
+
+  # Clean patent data
+  clean_patent <- patent_long %>%
+    # Ensure year is numeric
+    mutate(year = as.numeric(Years)) %>%
+    filter(year >= start_year, year <= end_year) %>%
+    filter(!is.na(Value), !is.na(geo)) %>%
+    group_by(geo, year) %>%
+    summarize(patents = sum(Value, na.rm = TRUE), .groups = "drop")
+
+  # Merge datasets
+  merged_data <- inner_join(clean_education, clean_patent, by = c("geo", "year"))
+  return(merged_data)
+}
+```
+
+
+
+```{r}
+#| message: false
+#| echo: false
+#| warning: false
+# Ensure merged_data is created by running the function
+merged_data <- prepare_data(education_long,patent_long)
+```
 
 ## Education attainment graphical analysis
 
@@ -593,7 +648,68 @@ of patent each year. Basically, if a country have more doctoral student it is
 more likely that this country will have more patent than an other. 
 
 
-## Sector graphical analysis 
+#### Sector analysis
+
+## Sector analysis preparation
+
+These codes will be useful later :
+```{r}
+
+#| message: false
+#| echo: false
+#| warning: false
+prepare_data2 <- function(key_long, patent_long, start_year = 2012, end_year = 2022) {
+  # Clean education data
+  clean_key <- key_long %>%
+    # Ensure year is numeric
+    mutate(year = as.numeric(Years),
+           # Map sector to their respective labels
+           sector = case_when(
+             sector == "S1" ~ "Total economy",
+             sector == "S11" ~ "Non-financial corporations",
+             sector == "S11_S12" ~ "Non-financial/financial corporate sectors",
+             sector == "S13" ~ "general government",
+             sector == "S14" ~ "Households",
+             sector == "S14_S15" ~ "Households and NPISHs",
+             TRUE ~ NA_character_  # Assign NA for unexpected values
+           )) %>%
+    # Filter years to reduce data volume
+    filter(year >= start_year, year <= end_year) %>%
+    # Remove rows with NA in key variables
+    filter(!is.na(sector), !is.na(geo))
+
+  # Clean patent data
+  clean_patent <- patent_long %>%
+    # Ensure year is numeric
+    mutate(year = as.numeric(Years),
+           # Ensure Value is numeric
+           Value = as.numeric(Value)) %>%
+    # Filter valid years and remove rows with missing data
+    filter(year >= start_year, year <= end_year) %>%
+    filter(!is.na(Value), !is.na(geo)) %>%
+    # Group and summarize patent data
+    group_by(geo, year) %>%
+    summarize(patents = sum(Value, na.rm = TRUE), .groups = "drop")
+
+  # Merge datasets
+  merged_data2 <- inner_join(clean_key, clean_patent, by = c("geo", "year"))
+  
+  return(merged_data2)
+}
+```
+
+
+```{r}
+#| message: false
+#| echo: false
+#| warning: false
+# Ensure merged_data is created by running the function
+merged_data2 <- prepare_data2(key_long,patent_long)
+```
+
+
+## Sector graphical analysis
+
 
 ```{r}
 key_indicator2 <- key_indicator |>
