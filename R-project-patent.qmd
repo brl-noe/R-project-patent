@@ -123,6 +123,7 @@ different sectors and agents of the economy of the country.
 ```{r}
 #| message: false
 #| echo: false
+library(png)
 here::i_am("R-project-patent.Rproj")
 image_data <- readPNG("Table1.png")          
 plot(1:2, type = "n", xlab = "", ylab = "", main = "Table1.png")  
