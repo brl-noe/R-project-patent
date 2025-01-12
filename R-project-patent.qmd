@@ -310,7 +310,6 @@ economy of the country is different. This fact limits the rigor of the
 approach for any analysis based on sectors.
 
 
-
 ### Description of the data joining, cleaning,ect. for education
 
 ```{r}
