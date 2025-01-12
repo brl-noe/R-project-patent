@@ -580,63 +580,114 @@ vet <- vet %>%
     country %in% c("BG", "HR", "HU", "RO", "SK") ~ "CEE",
     country %in% c("EL", "ES", "NO", "PT") ~ "WE",
     TRUE ~ "Other"  # To handle any other countries
-  ))
+  ),
+  # Convert categorical variables to factors
+  educational_attainment = as.factor(educational_attainment),
+  sector = as.factor(sector),
+  year = as.factor(year))
 
 ```
 
 ```{r}
- # Create a binary variable for Western countries (1 for Western, 0 for non-Western)
-vet <- vet %>%
-  mutate(is_western_binary = ifelse(country_group == "WE", 1, 0))
+# Run separate regressions for each group
+western_reg <- lm(patents.x ~ educational_attainment + sector + year,
+                 data = filter(vet, country_group == "WE"))
+
+eastern_reg <- lm(patents.x ~ educational_attainment + sector + year,
+                 data = filter(vet, country_group == "CEE"))
 ```
 
+
 ```{r}
-# Load the necessary library
-library(rdrobust)
+# Get robust standard errors for both models
+western_robust <- coeftest(western_reg, vcov = vcovHC(western_reg, type = "HC1"))
+eastern_robust <- coeftest(eastern_reg, vcov = vcovHC(eastern_reg, type = "HC1"))
+```
+
+
+```{r}
 library(dplyr)
 library(ggplot2)
+library(broom)
+library(sandwich)
+library(lmtest)
+# Create comparison table
+western_results <- tidy(western_robust) %>% mutate(group = "WE")
+eastern_results <- tidy(eastern_robust) %>% mutate(group = "CEE")
 
-# Step 3: Handle missing data (check for missing values in necessary columns)
-vet <- vet %>%
-  filter(!is.na(patents.x) & !is.na(is_western_binary))
-```
-
-```{r}
-# Step 4: Run RDD (Regression Discontinuity Design) using the existing binary indicator
-m <- rdrobust(vet$patents.x, vet$is_western_binary, c = 0)
-
-# Step 5: Summarize and plot the RDD result
-summary(m)
-rdplot(vet$patents.x, vet$is_western_binary)
+comparison_table <- bind_rows(western_results, eastern_results) %>%
+  arrange(term, group)
 ```
 
 
 ```{r}
-# Fit a linear model with interaction terms for country group and other predictors
-mw <- lm(patents.x ~ educational_attainment * country_group +
-        sector * country_group + 
-        age + sex, data = vet)
-
-# Output the model summary with robust standard errors
-mwsummary(mw, stars = c('*' = .1, '**' = .05, '***' = .01), vcov = 'robust')
-```
-
-
-```{r}
-# Group by country group and calculate average patents for each group
-binned <- vet %>%
+# Calculate summary statistics
+summary_stats <- vet %>%
   group_by(country_group) %>%
-  summarize(avg_patents = mean(patents.x, na.rm = TRUE))  # Ensure to handle missing values
+  summarise(
+    mean_patents = mean(patents.x, na.rm = TRUE),
+    sd_patents = sd(patents.x, na.rm = TRUE),
+    n_obs = n(),
+    r_squared_western = summary(western_reg)$r.squared,
+    r_squared_eastern = summary(eastern_reg)$r.squared
+  )
 ```
 
 
 ```{r}
-# Plot the average patent applications for Western vs. Eastern countries
-ggplot(binned, aes(x = country_group, y = avg_patents)) + 
-  geom_bar(stat = "identity", fill = "skyblue") +
+# Visualize predictions by group
+vet <- vet %>%
+  mutate(
+    predicted_patents_western = predict(western_reg, newdata = .),
+    predicted_patents_eastern = predict(eastern_reg, newdata = .)
+  )
+
+# Create scatter plot with regression lines
+ggplot(vet, aes(x = as.numeric(year), y = patents.x, color = country_group)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", se = TRUE) +
+  facet_wrap(~country_group) +
   theme_minimal() +
-  labs(title = "Average Patent Applications by Country Group", 
-       x = "Country Group", y = "Average Patent Applications")
+  labs(
+    title = "Patent Applications by Country Group",
+    x = "Year",
+    y = "Number of Patents",
+    color = "Country Group"
+  )
+
+# Print results
+print("Western Countries Regression Results:")
+print(western_robust)
+print("\nEastern Countries Regression Results:")
+print(eastern_robust)
+print("\nSummary Statistics:")
+print(summary_stats)
+```
+
+
+```{r}
+# Chow test for structural break between groups
+# Combine the data and run pooled regression
+pooled_reg <- lm(patents.x ~ educational_attainment + sector + year,
+                 data = vet)
+
+# Calculate F-statistic for Chow test
+n1 <- sum(vet$country_group == "Western")
+n2 <- sum(vet$country_group == "Eastern")
+k <- length(coef(pooled_reg))
+rss_pooled <- sum(residuals(pooled_reg)^2)
+rss_western <- sum(residuals(western_reg)^2)
+rss_eastern <- sum(residuals(eastern_reg)^2)
+
+f_stat <- ((rss_pooled - (rss_western + rss_eastern)) / k) / 
+          ((rss_western + rss_eastern) / (n1 + n2 - 2*k))
+
+p_value <- 1 - pf(f_stat, k, n1 + n2 - 2*k)
+
+# Print Chow test results
+print("\nChow Test Results:")
+print(paste("F-statistic:", round(f_stat, 4)))
+print(paste("p-value:", round(p_value, 4)))
 ```
 
 ### Data cleaning and merging 2
