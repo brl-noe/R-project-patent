@@ -403,7 +403,7 @@ merged_data <- prepare_data(education_long, patent_long)
 #| message: false
 #| echo: false
 filtered_data <- merged_data %>%
-  filter(geo %in% c("FR", "DE", "IT"))  # Replace with desired country codes
+  filter(geo %in% c("FR", "DE", "BG"))
 
 plot_education_patents <- ggplot(filtered_data, 
          aes(x = year, 
@@ -427,7 +427,7 @@ print(plot_education_patents)
 #| message: false
 #| echo: false
 filtered_data <- merged_data %>%
-  filter(year == 2022, geo %in% c("FR", "DE", "IT", "EU27_2020"))
+  filter(year == 2022, geo %in% c("FR", "DE", "BG", "EU27_2020"))
 
 plot_education_patents2 <- ggplot(filtered_data, 
          aes(x = geo, 
@@ -501,7 +501,7 @@ merged_data2 <- prepare_data2(key_long, patent_long)
 #| message: false
 #| echo: false
 filtered_data2 <- merged_data2 %>%
-  filter(geo %in% c("FR", "DE", "IT"))  # Replace with desired country codes
+  filter(geo %in% c("FR", "DE", "BG"))  # Replace with desired country codes
 
 plot_key_patents <- ggplot(filtered_data2, 
          aes(x = year, 
@@ -525,7 +525,7 @@ print(plot_key_patents)
 #| message: false
 #| echo: false
 filtered_data3 <- merged_data2 %>%
-  filter(year == 2022, geo %in% c("FR", "DE", "IT", "EU27_2020"))
+  filter(year == 2022, geo %in% c("FR", "DE", "BG", "EU27_2020"))
 
 plot_key_patents3 <- ggplot(filtered_data3, 
          aes(x = geo, 
@@ -545,6 +545,7 @@ print(plot_key_patents3)
 
 ## Description of the data joining, cleaning, etc. for combined data
 
+We merged the 2 dataset we create earlier by their common variables: geo and country. And then we rename a column for clarity: country=geo
 ```{r}
 #| message: false
 #| echo: false
@@ -730,9 +731,7 @@ dynamics based on a study by Stojkoski et al. (2021), titled
 "Differences in innovation relationships between Central and Eastern
 Europe and Western Europe: Evidence from CIS 2014".
 
-To replicate this approach and explore whether there's differences in
-the context of patent applications, we will group the countries as
-follows:
+To replicate this approach and explore further the differences between countries we observe in the regression, we will group the countries as follows:
 
 Central and Eastern Europe (CEE): This group includes countries such as
 Bulgaria (BG), Croatia (HR), Hungary(HU), Romania(RO), and Slovakia(SK).
