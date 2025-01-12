@@ -799,7 +799,11 @@ non-linear relationships
 #| message: false
 #| echo: false
 #| warning: false
-# 2. Average patents by country over time
+# Load necessary libraries
+library(ggplot2)
+library(dplyr)
+
+# Summarize data by country and year to get the average patents
 avg_by_country_year <- model_data %>%
   group_by(country, year) %>%
   summarise(
@@ -807,12 +811,21 @@ avg_by_country_year <- model_data %>%
     .groups = 'drop'
   )
 
-ggplot(avg_by_country_year, aes(x = year, y = avg_patents, color = country)) +
-  geom_line(group = 1) +
+# Create the scatter plot
+p <- ggplot(avg_by_country_year, aes(x = year, y = avg_patents, color = country, size = avg_patents)) +
+  geom_point() +
   theme_minimal() +
-  labs(title = "Average Patents by Country Over Time",
-       x = "Year",
-       y = "Average Patents")
+  labs(
+    title = "Average Patents by Country Over Time",
+    x = "Year",
+    y = "Average Patents"
+  ) +
+  scale_size_continuous(range = c(3, 15)) +  # Adjust point sizes based on average patents
+  theme(legend.position = "right")  # Position the legend to the right
+
+# Print the plot
+print(p)
+
 ```
 
 ```{r}
