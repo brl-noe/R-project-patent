@@ -638,6 +638,10 @@ ggplot(data.frame(fitted = fitted(fe_model),
        y = "Residuals")
 ```
 
+In the graph above, the x-axis shows the fitted (predicted) values from the regression model, the y-axis shows the residuals (the differences between observed and predicted values) and the red dashed line represents zero on the residuals scale.
+We observe that most residuals are clustered around the zero line for lower fitted values (left side), which is good. However, there appears to be increasing spread and some extreme residuals as the fitted values increase (right side).
+Moreover, there's evidence of heteroscedasticity (non-constant variance) since the spread of residuals isn't consistent across fitted values. The spread appears to increase with larger fitted values.
+The pattern suggests that the model might be: - Performing better for smaller values, - Less reliable for larger values, - Potentially missing some important non-linear relationships
 
 ```{r}
 #| message: false
@@ -669,6 +673,30 @@ print("\nRobust Standard Errors (Clustered by Country):")
 print(robust_se)
 ```
 
+Surprisingly, we observe that educational attainment levels show minimal and statistically insignificant effects on patent applications. For example:
+  Tertiary to Doctoral Education
+  Coefficient: 8.670e-11 (extremely small positive effect)
+  Marginal significance (p = 0.071)
+  This suggests that for each percentage point increase in the population with tertiary to doctoral        education, there is virtually no measurable impact on patent applications
+This unexpected result suggests that the relationship between education and patents might be more complex than directly measurable, possibly operating through other channels or requiring different measurement approaches. Indeed there 3 possible things that can explain this result: 
+  1) Scale Issue: The variables might need rescaling (e.g., education in percentages while patents in absolute numbers)
+  2) Model Specification: The relationship might be non-linear or requiring interaction terms
+  3) Data Structure: The strong country fixed effects might be absorbing most of the education-related variance
+  
+In fact, There are substantial and highly significant differences between countries in patent applications:
+Leading innovators: Germany (+48,064), France (+16,096), Switzerland (+9,169), Netherlands (+8,387)
+Lower patent activity: Many Eastern European countries show significantly negative coefficients, indicating structural differences in innovation systems
+These large country effects suggest that national innovation systems, institutional quality, and industrial base may be more important than educational metrics alone.
+
+Furthermore, we observe clear upward trend in patent applications over time:
+  Significant positive year effects from 2017-2022
+  Strongest effects in recent years (2021: +1,027, 2022: +993)
+  This suggests improving innovation capacity across Europe over time
+
+Finally, there's a sector effect, we observe significant differences across sectors:
+Non-financial corporations show significant negative effects while Household sector shows significant positive effects
+This indicates the importance of considering institutional structures in innovation.
+
 
 ```{r}
 #| message: false
@@ -682,6 +710,9 @@ print(paste("R-squared:", round(r2, 3)))
 print(paste("Adjusted R-squared:", round(adj_r2, 3)))
 ```
 
+We have a R-squared: 0.998 which mean that 99.8% of the variance in patent applications is explained by the independent variables in the model (educational attainment, sector, and year). The model is a very good fit for the data. Almost all the variation in the outcome variable (patent applications) is being explained by the predictors we have included.
+Moreover, since R-squared and Adjusted R-squared are the same, this suggests that you are not overfitting the model. It means that the model’s explanatory power is due to the actual relationship between the independent variables and the dependent variable, rather than just adding more predictors for the sake of increasing the R-squared.
+
 ```{r}
 #| message: false
 #| echo: false
@@ -689,6 +720,8 @@ print(paste("Adjusted R-squared:", round(adj_r2, 3)))
 library(car)
 vif(fe_model)
 ```
+
+The GVIF and GVIF^(1/(2*Df)) values are all very close to 1, with only minor exceptions for sector and country, which have GVIF values slightly above 1. These small values suggest that multicollinearity is not a major concern in your model.The absence of large GVIF values (i.e., values much greater than 1) indicates that multicollinearity is not severe, and the regression coefficients should be reliable.The slight inflation observed for sector and country indicates minor correlations with other variables, but these are not likely to cause significant issues with model estimation.
 
 ### Differences between region (CEE and WE)
 
