@@ -61,6 +61,15 @@ policymakers prioritize investments in education. This would potentially
 be more impactful and cost-effective than investing in other areas of
 the R&D process, such as infrastructure.
 
+<<<<<<< HEAD
+Useful table of abbreviations for countries :
+
+```{r}
+
+```
+
+=======
+>>>>>>> c307024afbb32af990d29c3c8479ee25a1d9e05e
 # II- Data sets descriptions
 
 For our analysis, we will use tree different datasets all coming from
@@ -114,7 +123,6 @@ different sectors and agents of the economy of the country.
 ```{r}
 #| message: false
 #| echo: false
-library(png)
 here::i_am("R-project-patent.Rproj")
 image_data <- readPNG("Table1.png")          
 plot(1:2, type = "n", xlab = "", ylab = "", main = "Table1.png")  
@@ -298,9 +306,9 @@ have to convert to numeric values.
 ```{r}
 #| message: false
 #| echo: false
-key_indicator <- key_indicator |>
+key_indicator2 <- key_indicator |>
   mutate(across(matches("^20|^19"), ~ as.numeric(.))) |> 
-  print(key_indicator)
+  print(key_indicator2)
 ```
 
 Here we have a big problem because each sector has its own na_item that
@@ -429,6 +437,36 @@ plot_education_patents2 <- ggplot(filtered_data,
           axis.text.x = element_text(angle = 45, hjust = 1))
 print(plot_education_patents2)
 ```
+
+
+```{r}
+library(viridis)
+
+filtered_data <- filtered_data %>%
+    group_by(geo) %>%
+    mutate(proportion = patents / sum(patents) * 100)  # add the proportion in percentage
+
+plot_education_patents2 <- ggplot(filtered_data, 
+         aes(x = geo, 
+             y = patents, 
+             fill = educational_attainment)) +
+    geom_bar(stat = "identity", position = "stack", width = 0.7, color = "black") +  # Adjust the borders of the sitcks
+    geom_text(aes(label = paste0(round(proportion, 1), "%")), 
+              position = position_stack(vjust = 0.5), size = 3) +  
+    scale_fill_viridis_d(name = "Education Level", option = "C") +  
+    theme_minimal() +
+    labs(x = "Country",
+         y = "Number of Patents",
+         title = "Patent Activity by Education Level and Country (2022)") +
+    theme(legend.position = "right",
+          plot.title = element_text(size = 14, face = "bold"),
+          axis.text.x = element_text(angle = 45, hjust = 1)) +
+    scale_y_continuous(expand = expansion(mult = c(0, 0.1))) 
+
+print(plot_education_patents2)
+
+```
+
 
 # Patent and key indicator application
 
@@ -947,11 +985,17 @@ print("\nSummary Statistics:")
 print(summary_stats)
 ```
 
-We observe that the "Other" group exhibits significantly higher patent averages and variability, indicating that it includes countries or entities with substantially greater patent output. In contrast, CEE countries demonstrate much lower patent activity and variability compared to both WE and the "Other" group.
-
-The R-squared value for the Western group is lower than that of the Eastern group, suggesting that the variation in patent applications among Eastern countries is better explained by the variables in our model (sector and educational attainment). However, it is important to note that there are 495 more observations in the Central and Eastern group compared to the Western group. This disparity in sample size impacts the R-squared values; larger groups tend to produce more stable and robust R-squared estimates, while smaller groups may result in less reliable values.
-
-To draw definitive conclusions, additional computations are required. For this reason, we use the adjusted R-squared, as it is less sensitive to differences in sample size. This metric provides a more accurate assessment of how well the model fits the data, especially when comparing groups with unequal sample sizes.
+We observe that, mean, sd, the R-squared of western is lower than the
+one of the eastern so the eastern countries patent application variation
+are more expalined by the variable sector and educational attainment
+(our model). However, there's 495 more observation in the central and
+eastern group than in the western group, this have effect on the
+R-squared, indeed, The group with more observations will likely have a
+more stable and robust R-squared value, while the smaller group might
+produce a less reliable one. So we need additional computation to
+conclude. We use a adjusted R-squarded becuase it's less sensitive to
+sample size differences and gives a more accurate measure of how well
+the model fits the data when comparing groups with unequal sample sizes.
 
 ```{r}
 # Get Adjusted R-squared for Western group
@@ -1001,15 +1045,6 @@ rss_pooled <- sum(residuals(pooled_reg)^2)
 rss_western <- sum(residuals(western_reg)^2)
 rss_eastern <- sum(residuals(eastern_reg)^2)
 
-cat("RSS Pooled:", rss_pooled, "\n")
-cat("RSS Western:", rss_western, "\n")
-cat("RSS Eastern:", rss_eastern, "\n")
-```
-The residual some of square for western countries is: 9300486501 and for central and eastern european countries is: 63183986.
-
-```{r}
-#| message: false
-#| echo: false
 f_stat <- ((rss_pooled - (rss_western + rss_eastern)) / k) / 
           ((rss_western + rss_eastern) / (n1 + n2 - 2*k))
 
@@ -1020,34 +1055,5 @@ print("\nChow Test Results:")
 print(paste("F-statistic:", round(f_stat, 4)))
 print(paste("p-value:", round(p_value, 4)))
 ```
-
-The Chow test was conducted to assess potential structural breaks between the "Western" and "Eastern" country groups. However, the results indicate potential issues:
-The calculated F-statistic is negative (F=−3365.676).This suggests a problem with the test setup or the underlying data.
-The p-value was not calculable (p=NaN), further confirming issues in the analysis.
-There's two possible reason for this issue:
-  1) Scaling Issues: The pooled regression includes significantly more observations than the group-specific regressions, leading to discrepancies in residual sum of squares (RSS) comparisons.
-  2) Data Imbalance: Unequal group sizes may have caused instability in the calculation of the Chow test statistic.
-That's the reason why The Chow test could not provide a reliable conclusion regarding structural breaks due to these limitations. Further analysis with more balanced or scaled data would be required for a robust test.
-
-#### Likelihood ratio test
-
-```{r}
-# Pooled model
-pooled_model <- lm(patents.x ~ educational_attainment + sector + year, data = vet)
-
-# Segmented model with group distinction
-segmented_model <- lm(patents.x ~ educational_attainment * country_group + 
-                      sector + year, data = vet)
-
-# Perform the likelihood ratio test
-anova(pooled_model, segmented_model)
-
-```
-
-To examine whether the relationship between educational attainment and patents differs across country groups, we compared two regression models using a likelihood ratio test.
-
-Model 1 included educational attainment, sector, and year as predictors of patents.
-Model 2 expanded on Model 1 by incorporating interaction terms between educational attainment and country group, allowing the effect of educational attainment to vary across country groups.
-The likelihood ratio test indicated that Model 2 provides a significantly better fit to the data (F-statistic = 148.26, p-value < 2.2e-16). The inclusion of the interaction terms led to a substantial reduction in the residual sum of squares (RSS), suggesting that the relationship between educational attainment and patents differs across country groups.
 
 # IV- conclusion
