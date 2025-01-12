@@ -515,38 +515,118 @@ combined_data <- combined_data %>%
 ## Regression
 
 ### Panel regression & panel regression with lagged effect
-
 ```{r}
-panel_model <- plm(patents.x ~ educational_attainment + sector,
-                  data = combined_data,
-                  index = c("country", "year"),
-                  model = "within",
-                  effect = "twoways")
+
+```
+
+We wanted to do a panel data analysis but there's a huge issue with duplicates we weren't able to fixed. I put the code with #.  
+```{r}
+# First, let's check for duplicates
+duplicates_check <- combined_data %>%
+  group_by(country, year) %>%
+  summarise(
+    count = n(),
+    .groups = 'drop'
+  ) %>%
+  filter(count > 1)
+
+print("Checking for duplicate country-year combinations:")
+print(duplicates_check)
 ```
 
 ```{r}
-# 6. Get robust standard errors
-coeftest(panel_model, vcov = vcovHC(panel_model, type = "HC1"))
+# Basic panel model
+#panel_model <- plm(patents.x ~ educational_attainment + sector,data = panel_data,index = c("country", "year"),model = "within",effect = "twoways")
 ```
 
 ```{r}
-# 7. Additional model with lagged effects
-panel_model_lagged <- plm(patent_count ~ lag(value, 1) + educational_attainment + sector,
-                         data = panel_data,
-                         index = c("country", "year"),
-                         model = "within",
-                         effect = "twoways")
+# Prepare data - no need to handle duplicates
+model_data <- combined_data %>%
+  mutate(
+    year = as.factor(year),         # Convert year to factor for fixed effects
+    country = as.factor(country),   # Convert country to factor
+    educational_attainment = as.factor(educational_attainment),
+    sector = as.factor(sector)
+  )
 ```
 
-```{r}
-# Summary statistics
-summary(panel_model)
-summary(panel_model_lagged)
-```
 
 ```{r}
-# We evaluate the residuals
-plot(panel_model$residuals)
+# Run fixed effects regression
+# This includes country and year fixed effects
+fe_model <- lm(patents.x ~ educational_attainment + sector + 
+               country + year,  # Country and year fixed effects
+               data = model_data)
+```
+
+
+```{r}
+# Get robust standard errors clustered by country
+robust_se <- coeftest(fe_model, 
+                     vcov = vcovCL, 
+                     cluster = model_data$country)
+# Create diagnostic plots
+# 1. Residuals vs Fitted
+ggplot(data.frame(fitted = fitted(fe_model), 
+                 residuals = residuals(fe_model)), 
+       aes(x = fitted, y = residuals)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  theme_minimal() +
+  labs(title = "Residuals vs Fitted Values",
+       x = "Fitted Values",
+       y = "Residuals")
+```
+
+
+```{r}
+# 2. Average patents by country over time
+avg_by_country_year <- model_data %>%
+  group_by(country, year) %>%
+  summarise(
+    avg_patents = mean(patents.x),
+    .groups = 'drop'
+  )
+
+ggplot(avg_by_country_year, aes(x = year, y = avg_patents, color = country)) +
+  geom_line(group = 1) +
+  theme_minimal() +
+  labs(title = "Average Patents by Country Over Time",
+       x = "Year",
+       y = "Average Patents")
+```
+
+
+```{r}
+# Print results
+print("Fixed Effects Regression Results:")
+print(summary(fe_model))
+print("\nRobust Standard Errors (Clustered by Country):")
+print(robust_se)
+```
+
+
+```{r}
+# Calculate R-squared
+r2 <- summary(fe_model)$r.squared
+adj_r2 <- summary(fe_model)$adj.r.squared
+
+print("\nModel Fit Statistics:")
+print(paste("R-squared:", round(r2, 3)))
+print(paste("Adjusted R-squared:", round(adj_r2, 3)))
+```
+
+
+```{r}
+# Basic model predictions
+model_data$predicted <- predict(fe_model)
+```
+
+
+```{r}
+# Calculate mean absolute error
+mae <- mean(abs(model_data$patents.x - model_data$predicted))
+print(paste("\nMean Absolute Error:", round(mae, 3)))
 ```
 
 ```{r}
