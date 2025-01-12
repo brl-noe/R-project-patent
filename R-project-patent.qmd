@@ -1179,7 +1179,7 @@ print(map_europe)
 ```
 
 
-# Interactive Maps (could be long to charge)
+### Interactive Maps (could be long to charge)
 
 ```{r}
 #| message: false
