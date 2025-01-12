@@ -555,6 +555,9 @@ merged_data <- prepare_data(education_long,patent_long)
 
 We first clean the data and filter to take countries we're interested in 
 ```{r}
+#| message: false
+#| echo: false
+#| warning: false
 education_analysis <- education |>
   filter(!is.na(isced11)) |> # We suppress NA values otherwise it gets bizarre
   filter(geo == "FR" | geo == "DE" | geo == "BG") |>
@@ -564,6 +567,9 @@ print(education_analysis)
 
 Then we label the education attainments :
 ```{r}
+#| message: false
+#| echo: false
+#| warning: false
 education_analysis <- education_analysis |>
   mutate(isced11 = case_when(
              isced11 == "ED0-2" ~ "Lower secondary education",
@@ -578,6 +584,9 @@ education_analysis <- education_analysis |>
 
 finally we get the graphs for the two countries we are interested in :
 ```{r}
+#| message: false
+#| echo: false
+#| warning: false
 education_analysis |>
   filter(geo == "FR" ) |>
   pivot_longer(
@@ -609,6 +618,9 @@ education_analysis |>
 ```
 
 ```{r}
+#| message: false
+#| echo: false
+#| warning: false
 education_analysis |>
   filter(geo == "BG") |>  
   pivot_longer(
@@ -654,7 +666,6 @@ more likely that this country will have more patent than an other.
 
 These codes will be useful later :
 ```{r}
-
 #| message: false
 #| echo: false
 #| warning: false
@@ -712,6 +723,9 @@ merged_data2 <- prepare_data2(key_long,patent_long)
 
 
 ```{r}
+#| message: false
+#| echo: false
+#| warning: false
 key_indicator2 <- key_indicator |>
   mutate(sector = case_when(
              sector == "S1" ~ "Total economy",
@@ -728,6 +742,9 @@ key_indicator2 <- key_indicator |>
 
 
 ```{r}
+#| message: false
+#| echo: false
+#| warning: false
 sector_analysis <- key_indicator2 |>
   filter(sector != "Total economy") |>  # Exclure le secteur "Total economy"
   filter(!is.na(sector)) |>  # Supprimer les valeurs NA pour éviter les problèmes
@@ -830,6 +847,9 @@ print(duplicates_check)
 ```
 
 ```{r}
+#| message: false
+#| echo: false
+#| warning: false
 # Basic panel model
 #panel_model <- plm(patents.x ~ educational_attainment + sector,data = panel_data,index = c("country", "year"),model = "within",effect = "twoways")
 ```
