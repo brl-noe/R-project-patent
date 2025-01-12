@@ -638,6 +638,7 @@ Western Europe (WE): This group consists of Greece(EL), Spain(ES),
 Norway(NO), and Portugal(PT).
 
 ```{r}
+vet <- combined_data
 # Prepare vet data
 vet <- vet %>%
   mutate(
@@ -656,6 +657,7 @@ vet <- vet %>%
 
 ```{r}
 # Recode country codes
+conflicts_prefer(dplyr::recode)
 vet$country <- recode(
   vet$country,
   "BG" = "BGR",
@@ -697,6 +699,28 @@ map_europe <- ggplot(data = europe_merged) +
     title = "European Countries by Group",
     fill = "Group"
   )
+print(map_europe)
+```
+
+```{r}
+# Install necessary packages if you haven't already
+# install.packages("leaflet")
+library(leaflet)
+library(sf)
+
+# Create the leaflet map
+interactive_map <- leaflet(data = europe_merged) %>%
+  addProviderTiles("CartoDB.Positron") %>%  # Add basemap
+  addPolygons(
+    fillColor = ~viridis::viridis(1)[1],  # Use a color palette (customize as needed)
+    fillOpacity = 0.7,
+    color = "black",  # Border color
+    weight = 1,
+    popup = ~paste("Country:", name, "<br>Group:", patents.x)  # Customize the popup info
+  )
+
+# Show the interactive map
+print(interactive_map)
 
 ```
 
