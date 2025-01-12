@@ -466,27 +466,6 @@ print(plot_education_patents)
 ```{r}
 #| message: false
 #| echo: false
-filtered_data <- merged_data %>%
-  filter(year == 2022, geo %in% c("FR", "DE", "BG", "EU27_2020"))
-
-plot_education_patents2 <- ggplot(filtered_data, 
-         aes(x = geo, 
-             y = patents, 
-             fill = educational_attainment)) +
-    geom_bar(stat = "identity", position = "dodge") +
-    scale_fill_viridis_d(name = "Education Level") +
-    theme_minimal() +
-    labs(x = "Country",
-         y = "Number of Patents",
-         title = "Patent Activity by Education Level and Country (2022)") +
-    theme(legend.position = "right",
-          plot.title = element_text(size = 14, face = "bold"),
-          axis.text.x = element_text(angle = 45, hjust = 1))
-print(plot_education_patents2)
-```
-
-
-```{r}
 library(viridis)
 
 filtered_data <- filtered_data %>%
@@ -624,6 +603,35 @@ plot_key_patents <- ggplot(
 
 # 3. Display the plot
 print(plot_key_patents)
+```
+
+```{r}
+#| message: false
+#| echo: false
+library(viridis)
+
+filtered_data3 <- merged_data2 %>%
+    group_by(geo) %>%
+    mutate(proportion = patents / sum(patents) * 100)  # add the proportion in percentage
+
+plot_key_patents2 <- ggplot(filtered_data3, 
+         aes(x = geo, 
+             y = patents, 
+             fill = sector)) +
+    geom_bar(stat = "identity", position = "stack", width = 0.7) +  # Adjust the borders of the sitcks
+    geom_text(aes(label = paste0(round(proportion, 1), "%")), 
+              position = position_stack(vjust = 0.5), size = 3) +  
+    scale_fill_viridis_d(name = "Sector", option = "C") +  
+    theme_minimal() +
+    labs(x = "Country",
+         y = "Number of Patents",
+         title = "Patent Activity by Sector and Country (2022)") +
+    theme(legend.position = "right",
+          plot.title = element_text(size = 14, face = "bold"),
+          axis.text.x = element_text(angle = 45, hjust = 1)) +
+    scale_y_continuous(expand = expansion(mult = c(0, 0.1))) 
+
+print(plot_key_patents2)
 ```
 
 
