@@ -545,6 +545,8 @@ merged_data2 <- prepare_data2(key_long, patent_long)
 ```
 
 ```{r}
+#| message: false
+#| echo: false
 # 1. Data Preparation - Filter for specific years
 filtered_data2 <- merged_data2 %>%
   filter(
