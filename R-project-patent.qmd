@@ -638,21 +638,69 @@ Western Europe (WE): This group consists of Greece(EL), Spain(ES),
 Norway(NO), and Portugal(PT).
 
 ```{r}
-vet <- combined_data
-
-# Define country groups based on region
+# Prepare vet data
 vet <- vet %>%
-  mutate(country_group = case_when(
-    country %in% c("BG", "HR", "HU", "RO", "SK") ~ "CEE",
-    country %in% c("EL", "ES", "NO", "PT") ~ "WE",
-    TRUE ~ "Other"  # To handle any other countries
-  ),
-  # Convert categorical variables to factors
-  educational_attainment = as.factor(educational_attainment),
-  sector = as.factor(sector),
-  year = as.factor(year))
+  mutate(
+    country_group = case_when(
+      country %in% c("BG", "HR", "HU", "RO", "SK") ~ "CEE",
+      country %in% c("EL", "ES", "NO", "PT") ~ "WE",
+      TRUE ~ "Other"  # To handle any other countries
+    ),
+    # Convert categorical variables to factors
+    educational_attainment = as.factor(educational_attainment),
+    sector = as.factor(sector),
+    year = as.factor(year)
+  )
+```
+
+
+```{r}
+# Recode country codes
+vet$country <- recode(
+  vet$country,
+  "BG" = "BGR",
+  "HR" = "HRV",
+  "HU" = "HUN",
+  "RO" = "ROU",
+  "SK" = "SVK",
+  "EL" = "GRC",
+  "ES" = "ESP",
+  "NO" = "NOR",
+  "PT" = "PRT"
+)
+```
+
+
+```{r}
+# Load libraries and get European map data
+library(sf)
+library(rnaturalearth)
+library(ggplot2)
+
+world <- ne_countries(scale = "medium", returnclass = "sf")
+europe <- world[world$region_un == "Europe", ]
+```
+
+
+```{r}
+# Merge map data with vet data
+europe_merged <- merge(europe, vet, by.x = "sov_a3", by.y = "country", all.x = TRUE)
+```
+
+
+```{r}
+# Plot the map
+map_europe <- ggplot(data = europe_merged) +
+  geom_sf(aes(fill = patents.x)) +
+  theme_minimal() +
+  labs(
+    title = "European Countries by Group",
+    fill = "Group"
+  )
 
 ```
+
+#### Regression
 
 ```{r}
 # Run separate regressions for each group
