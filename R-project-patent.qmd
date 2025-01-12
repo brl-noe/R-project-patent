@@ -61,6 +61,15 @@ policymakers prioritize investments in education. This would potentially
 be more impactful and cost-effective than investing in other areas of
 the R&D process, such as infrastructure.
 
+<<<<<<< HEAD
+Useful table of abbreviations for countries :
+
+```{r}
+
+```
+
+=======
+>>>>>>> c307024afbb32af990d29c3c8479ee25a1d9e05e
 # II- Data sets descriptions
 
 For our analysis, we will use tree different datasets all coming from
@@ -111,6 +120,21 @@ distribution of income, redistribution of income, use of income and
 non-financial accumulation. These stages are estimated in percentage for
 different sectors and agents of the economy of the country.
 
+```{r}
+#| message: false
+#| echo: false
+here::i_am("R-project-patent.Rproj")
+image_data <- readPNG("Table1.png")          
+plot(1:2, type = "n", xlab = "", ylab = "", main = "Table1.png")  
+rasterImage(image_data, 1, 1, 2, 2)  
+```
+
+```{r}
+image_data <- readPNG("Table2.png")          
+plot(1:2, type = "n", xlab = "", ylab = "", main = "Table2.png")  
+rasterImage(image_data, 1, 1, 2, 2) 
+```
+
 ## Basics informations about the databases
 
 ```{r}
@@ -129,15 +153,11 @@ library(plm)
 library(AER)
 library(sandwich)
 theme_set(theme_bw())
+library(png)
 conflicted::conflict_prefer("filter", "dplyr")
 ```
 
-```{r}
-## Loading the data
-#| message: false
-#| echo: false
-here::i_am("R-project-patent.Rproj")
-```
+
 
 ```{r}
 #| message: false
@@ -268,7 +288,7 @@ patent_EU27 |>
   geom_point() 
 ```
 
-Similarely as before, if we only consider the 27 countries of the euro
+Similarly as before, if we only consider the 27 countries of the euro
 zone, we notice the same trend in the global number of patent.
 
 ### Description of the data joining, cleaning, etc. for key indicator
@@ -295,15 +315,9 @@ Here we have a big problem because each sector has its own na_item that
 correspond to the method of calculation. In other words, in each
 countries the method to evaluate the percentage of each sector in the
 economy of the country is different. This fact limits the rigor of the
-approach for any analysis based  on sectors.
+approach for any analysis based on sectors.
 
-```{r}
-#| message: false
-#| echo: false
-key_long <- key_indicator |>
-  pivot_longer(cols = starts_with("20"), names_to = "Years", values_to = "Value")
-print(key_long)
-```
+
 
 ### Description of the data joining, cleaning,ect. for education
 
