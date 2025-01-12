@@ -61,12 +61,15 @@ policymakers prioritize investments in education. This would potentially
 be more impactful and cost-effective than investing in other areas of
 the R&D process, such as infrastructure.
 
+<<<<<<< HEAD
 Useful table of abbreviations for countries :
 
 ```{r}
 
 ```
 
+=======
+>>>>>>> c307024afbb32af990d29c3c8479ee25a1d9e05e
 # II- Data sets descriptions
 
 For our analysis, we will use tree different datasets all coming from
@@ -312,33 +315,9 @@ Here we have a big problem because each sector has its own na_item that
 correspond to the method of calculation. In other words, in each
 countries the method to evaluate the percentage of each sector in the
 economy of the country is different. This fact limits the rigor of the
-approach for any analysis based  on sectors.
+approach for any analysis based on sectors.
 
-```{r}
-#| message: false
-#| echo: false
-key_indicator2 |>
-  filter(geo == "FR") |>
-  ggplot(aes())
-```
 
-```{r}
-#| message: false
-#| echo: false
-key_long <- key_indicator |>
-  pivot_longer(cols = starts_with("20"), names_to = "Years", values_to = "Value")
-print(key_long)
-```
-
-```{r}
-#| message: false
-#| echo: false
-key_long |>
-  filter(geo == "FR") |>
-  filter(sector == "S11") |>
-  ggplot(aes(x = Years, y= Value, fill= sector)) +
-  geom_bar()
-```
 
 ### Description of the data joining, cleaning,ect. for education
 
