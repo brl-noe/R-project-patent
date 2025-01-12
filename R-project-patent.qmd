@@ -153,8 +153,6 @@ theme_set(theme_bw())
 conflicted::conflict_prefer("filter", "dplyr")
 ```
 
-
-
 ```{r}
 #| message: false
 #| echo: false
@@ -919,6 +917,32 @@ inflation observed for sector and country indicates minor correlations
 with other variables, but these are not likely to cause significant
 issues with model estimation.
 
+#### Chi-Squared Test on Sectoral Effects
+
+```{r}
+
+# Create a contingency table for the counts of patents across sectors
+sector_table <- table(merged_data2$sector, merged_data2$patents)
+
+# Perform the chi-squared test
+chi_test <- chisq.test(sector_table)
+
+# Display the results
+print(chi_test)
+
+# Check expected values to ensure they are not too small
+print(chi_test$expected)
+
+# Interpretation
+if (chi_test$p.value < 0.05) {
+  cat("Significant differences exist in patent applications across sectors (p < 0.05).\n")
+} else {
+  cat("No significant differences in patent applications across sectors (p >= 0.05).\n")
+}
+
+```
+
+
 ### Differences between region (CEE and WE)
 
 We will create two groups of countries to compare their innovation
@@ -1211,9 +1235,7 @@ print(paste("p-value:", round(p_value, 4)))
 
 The Chow test was conducted to assess potential structural breaks between the "Western" and "Eastern" country groups. However, the results indicate potential issues:
 
-The calculated 
-𝐹
-F-statistic is negative (F=−3365.676), which is not meaningful in this context. This suggests a problem with the test setup or the underlying data.
+The calculated F-statistic is negative (F=−3365.676), which is not meaningful in this context. This suggests a problem with the test setup or the underlying data.
 The p-value is not calculable (p=NaN), further confirming issues in the analysis.
 Possible Causes:
   Scaling Issues: The pooled regression includes significantly more observations than the group-specific regressions, leading to discrepancies in residual sum of squares (RSS) comparisons.
