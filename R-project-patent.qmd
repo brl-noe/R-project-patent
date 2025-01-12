@@ -344,16 +344,6 @@ print(education_long)
 ```
 
 
-
-
-
-
-
-
-
-
-
-
 # Patent and education application
 
 ```{r}
@@ -465,35 +455,20 @@ plot_education_patents <- ggplot(
 print(plot_education_patents)
 ```
 
-```{r}
-library(ggplot2)
-library(dplyr)
-
-# Supposons que votre dataframe s'appelle `data`
-# Remplacez "data" par le nom réel de votre dataframe
-
-# Création du graphique
-ggplot(filtered_data, aes(x = year, y = patents, fill = educational_attainment)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  facet_wrap(~ geo, scales = "free") +
-  scale_fill_viridis_d(name = "Educational Attainment") +
-  theme_minimal() +
-  labs(
-    x = "Year",
-    y = "Number of Patents",
-    title = "Number of Patents by Educational Attainment for Each Country (by Year)"
-  ) +
-  theme(
-    legend.position = "bottom",
-    plot.title = element_text(size = 14, face = "bold"),
-    axis.text.x = element_text(angle = 45, hjust = 1)
-  )
-
-```
-
-# Analysis on education in coutries
+For France and Bulgaria we find a global upward trend in the number of patent
+over the years. For Germany the number is more stable.We also notice that
+in each country the order of magnitude of the number of patent is not the same. 
+Indeed France and Germany deal with values at the a ten thousand order of 
+magnitude whereas Bulgaria is only reaching about hundred patents when the 
+country reached the year 2021. We may conclude that this difference is due
+to the economic status of the countries. That could be true however we have 
+another variable to take in consideration which is the education attainment. 
+Let's take France and Bulgaria for example. 
 
 
+# Education graphical analysis
+
+We first clean the data and filter to take countries we're interested in 
 ```{r}
 education_analysis <- education |>
   filter(!is.na(isced11)) |> # We suppress NA values otherwise it gets bizarre
@@ -502,6 +477,7 @@ education_analysis <- education |>
 print(education_analysis)
 ```
 
+Then we label the education attainements :
 ```{r}
 education_analysis <- education_analysis |>
   mutate(isced11 = case_when(
@@ -512,11 +488,10 @@ education_analysis <- education_analysis |>
              isced11 == "ED5-8" ~ "Tertiary to Doctoral",
              isced11 == "ED3-8" ~ "Upper secondary to doctoral",
              TRUE ~ isced11  
-           ))
+           )) # We label the education levels
 ```
 
-
-
+finally we get the graphs for the two countries we are interested in :
 ```{r}
 education_analysis |>
   filter(geo == "FR" ) |>
@@ -533,7 +508,7 @@ education_analysis |>
   mutate(Proportion = Value / sum(Value, na.rm = TRUE)) |>  # We take a proportion of each education level                                                              #per year
   ggplot(aes(x = Years, y = Proportion, fill = isced11)) +
   geom_bar(stat = "identity", position = "stack") +  
-  scale_fill_viridis_d(name = "Education Level") +  # Palette de couleurs
+  scale_fill_viridis_d(name = "Education Level") +  
   theme_minimal() +  
   labs(
     title = "Share of Educational Levels in Patent Activity (France)",
@@ -543,242 +518,111 @@ education_analysis |>
   ) +
   theme(
     plot.title = element_text(size = 14, face = "bold"),
-    axis.text.x = element_text(angle = 45, hjust = 1),  # Rotation des étiquettes de l'axe X
+    axis.text.x = element_text(angle = 45, hjust = 1),  
+    legend.position = "right"
+  )
+```
+
+```{r}
+education_analysis |>
+  filter(geo == "BG") |>  # Changer "FR" par "BG" pour la Bulgarie
+  pivot_longer(
+    cols = starts_with("19") | starts_with("20"), 
+    names_to = "Years", 
+    values_to = "Value"
+  ) |>
+  mutate(
+    Years = as.numeric(Years),           # Transformer les valeurs de Years en format numérique 
+    Value = as.numeric(Value)            # Même chose pour Value
+  ) |>
+  group_by(Years) |>
+  mutate(Proportion = Value / sum(Value, na.rm = TRUE)) |>  # Proportion par niveau d'éducation par année
+  ggplot(aes(x = Years, y = Proportion, fill = isced11)) +
+  geom_bar(stat = "identity", position = "stack") +  
+  scale_fill_viridis_d(name = "Education Level") +  
+  theme_minimal() +  
+  labs(
+    title = "Share of Educational Levels in Patent Activity (Bulgaria)",
+    x = "Years",
+    y = "Proportion",
+    fill = "Education Level"
+  ) +
+  theme(
+    plot.title = element_text(size = 14, face = "bold"),
+    axis.text.x = element_text(angle = 45, hjust = 1),  
     legend.position = "right"
   )
 
 ```
 
 
+If we compare the two countries we notice a difference especially in the 
+"Tertiary to Doctoral" education level. The proportion of high educated citizens
+can explain with the economy wealth of the country the differences in number
+of patent each year. Basically, if a country have more doctoral student it is 
+more likely that this will have patent than an other. 
 
-
-
-
-
-
-
-
-
-
-
-```{r}
-filtered_data |>
-  group_by(year) |>
-  select(educational_attainment)
-```
-
-
-
-
-
+# Sector graphical analysis 
 
 
 ```{r}
-filtered_data <- merged_data %>%
-  filter(geo %in% c("FR", "DE", "BG"),  # Selected countries
-    year %in% c(2012, 2015, 2018, 2021))# Show only these years
-
-plot_education <- ggplot(filtered_data, aes(x = year, y = education))
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-```{r}
-#| message: false
-#| echo: false
-filtered_data <- merged_data %>%
-  filter(year == 2022, geo %in% c("FR", "DE", "BG", "EU27_2020"))
-
-plot_education_patents2 <- ggplot(filtered_data, 
-         aes(x = geo, 
-             y = patents, 
-             fill = educational_attainment)) +
-    geom_bar(stat = "identity", position = "dodge") +
-    scale_fill_viridis_d(name = "Education Level") +
-    theme_minimal() +
-    labs(x = "Country",
-         y = "Number of Patents",
-         title = "Patent Activity by Education Level and Country (2022)") +
-    theme(legend.position = "right",
-          plot.title = element_text(size = 14, face = "bold"),
-          axis.text.x = element_text(angle = 45, hjust = 1))
-print(plot_education_patents2)
-```
-
-
-```{r}
-library(viridis)
-
-filtered_data <- filtered_data %>%
-    group_by(geo) %>%
-    mutate(proportion = patents / sum(patents) * 100)  # add the proportion in percentage
-
-plot_education_patents2 <- ggplot(filtered_data, 
-         aes(x = geo, 
-             y = patents, 
-             fill = educational_attainment)) +
-    geom_bar(stat = "identity", position = "stack", width = 0.7, color = "black") +  # Adjust the borders of the sitcks
-    geom_text(aes(label = paste0(round(proportion, 1), "%")), 
-              position = position_stack(vjust = 0.5), size = 3) +  
-    scale_fill_viridis_d(name = "Education Level", option = "C") +  
-    theme_minimal() +
-    labs(x = "Country",
-         y = "Number of Patents",
-         title = "Patent Activity by Education Level and Country (2022)") +
-    theme(legend.position = "right",
-          plot.title = element_text(size = 14, face = "bold"),
-          axis.text.x = element_text(angle = 45, hjust = 1)) +
-    scale_y_continuous(expand = expansion(mult = c(0, 0.1))) 
-
-print(plot_education_patents2)
-```
-
-
-# Patent and key indicator application
-
-```{r}
-#| message: false
-#| echo: false
-prepare_data2 <- function(key_long, patent_long, start_year = 2012, end_year = 2022) {
-  # Clean education data
-  clean_key <- key_long %>%
-    # Ensure `year` is numeric
-    mutate(year = as.numeric(Years),
-           # Map `sector` to their respective labels
-           sector = case_when(
+key_indicator2 <- key_indicator |>
+  mutate(sector = case_when(
              sector == "S1" ~ "Total economy",
              sector == "S11" ~ "Non-financial corporations",
              sector == "S11_S12" ~ "Non-financial/financial corporate sectors",
              sector == "S13" ~ "general government",
              sector == "S14" ~ "Households",
              sector == "S14_S15" ~ "Households and NPISHs",
-             TRUE ~ NA_character_  # Assign NA for unexpected values
-           )) %>%
-    # Filter years to reduce data volume
-    filter(year >= start_year, year <= end_year) %>%
-    # Remove rows with NA in key variables
-    filter(!is.na(sector), !is.na(geo))
-
-  # Clean patent data
-  clean_patent <- patent_long %>%
-    # Ensure `year` is numeric
-    mutate(year = as.numeric(Years),
-           # Ensure `Value` is numeric
-           Value = as.numeric(Value)) %>%
-    # Filter valid years and remove rows with missing data
-    filter(year >= start_year, year <= end_year) %>%
-    filter(!is.na(Value), !is.na(geo)) %>%
-    # Group and summarize patent data
-    group_by(geo, year) %>%
-    summarize(patents = sum(Value, na.rm = TRUE), .groups = "drop")
-
-  # Merge datasets
-  merged_data2 <- inner_join(clean_key, clean_patent, by = c("geo", "year"))
-  
-  return(merged_data2)
-}
+             TRUE ~ sector  
+           ))
 ```
 
 ```{r}
-#| message: false
-#| echo: false
-# Ensure merged_data is created by running the function
-merged_data2 <- prepare_data2(key_long, patent_long)
-```
-
-```{r}
-# 1. Data Preparation - Filter for specific years
-filtered_data2 <- merged_data2 %>%
-  filter(
-    geo %in% c("FR", "DE", "BG"),  # Selected countries
-    year %in% c(2012, 2015, 2018, 2021)  # Show only these years
-  )
-
-# 2. Create the plot
-plot_key_patents <- ggplot(
-  filtered_data2, 
-  aes(
-    x = year, 
-    y = patents, 
-    color = sector,  # Different color for each sector
-    linetype = sector,  # Different line type for each sector
-    group = sector
-  )
-) +
-  # Add lines
-  geom_line(size = 1.2) +
-  # Add points to show exact values
-  geom_point(size = 3) +
-  # Separate by country
-  facet_wrap(
-    ~ geo, 
-    scales = "free_y",
-    labeller = labeller(geo = c(
-      "FR" = "France",
-      "DE" = "Germany",
-      "BG" = "Bulgaria"
-    ))
-  ) +
-  # Adjust scales for better visibility
-  scale_y_continuous(labels = scales::comma) +  # Add commas to numbers
-  scale_x_continuous(breaks = c(2012, 2015, 2018, 2021)) +  # Show only selected years
-  # Customize colors
-  scale_color_brewer(palette = "Set2") +
-  # Labels
-  labs(
-    x = "Year",
-    y = "Number of Patents",
-    title = "Patent Activity by Country",
-    color = "Sector",
-    linetype = "Sector"
-  ) +
-  # Theme customization
+sector_analysis <- key_indicator2 |>
+  filter(sector != "Total economy") |> # For 
+  filter(!is.na(sector)) |>  # Supprimer les valeurs NA pour éviter les problèmes
+  filter(geo %in% c("FR", "DE", "BG")) |>  # Filtrer pour France, Allemagne et Bulgarie
+  select(where(~ all(!is.na(.)))) |>  # Conserver uniquement les colonnes sans NA
+  pivot_longer(
+    cols = starts_with("19") | starts_with("20"),
+    names_to = "Years",
+    values_to = "Value"
+  ) |>
+  mutate(
+    Years = as.numeric(Years),  # Transformer les années en numérique
+    Value = as.numeric(Value)  # Transformer les valeurs en numérique
+  ) |>
+  group_by(geo, Years) |>  # Regrouper par pays et années
+  mutate(Proportion = Value / sum(Value, na.rm = TRUE))  # Calculer les proportions par secteur par pays et par année
+ggplot(sector_analysis, aes(x = Years, y = Proportion, fill = sector)) +
+  geom_bar(stat = "identity", position = "stack") +
+  facet_wrap(~geo, scales = "free_x", nrow = 1) +  # Facettes pour chaque pays, une seule ligne
+  scale_fill_viridis_d(name = "Sector") +  # Palette de couleurs
+  scale_x_continuous(breaks = seq(1980, 2020, by = 10)) +  # Limite les intervalles de l'axe X
   theme_minimal() +
+  labs(
+    title = "Share of Sectors in Patent Activity (France, Germany, Bulgaria)",
+    x = "Years",
+    y = "Proportion",
+    fill = "Sector"
+  ) +
   theme(
-    legend.position = "bottom",  # Move legend to bottom
     plot.title = element_text(size = 14, face = "bold"),
-    strip.text = element_text(size = 12, face = "bold"),  # Country names
-    axis.text.x = element_text(angle = 0)  # Horizontal year labels
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 10),  # Inclinaison des étiquettes X
+    legend.position = "right",
+    legend.text = element_text(size = 10),  # Texte de légende plus grand
+    strip.text = element_text(size = 12, face = "bold")  # Titres des facettes plus clairs
   )
 
-# 3. Display the plot
-print(plot_key_patents)
 ```
+As we can see on the graph, our data is not as clean as wished however we still
+can see the role of each sector for patent. In western Europe countries we 
+notice the importance of governments and Households Non-profit institutions 
+serving households (NPISH). Since, France and Germany have more patent over the
+years than Bulgaria, it seems that the more patent governments and Households 
+and NPISHs have a role in the economy, the more patent you get. 
 
-
-```{r}
-#| message: false
-#| echo: false
-filtered_data3 <- merged_data2 %>%
-  filter(year == 2022, geo %in% c("FR", "DE", "BG", "EU27_2020"))
-
-plot_key_patents3 <- ggplot(filtered_data3, 
-         aes(x = geo, 
-             y = patents, 
-             fill = sector)) +
-    geom_bar(stat = "identity", position = "dodge") +
-    scale_fill_viridis_d(name = "Education Level") +
-    theme_minimal() +
-    labs(x = "Country",
-         y = "Number of Patents",
-         title = "Patent Activity by Sector and Country (2022)") +
-    theme(legend.position = "right",
-          plot.title = element_text(size = 14, face = "bold"),
-          axis.text.x = element_text(angle = 45, hjust = 1))
-print(plot_key_patents3)
-```
 
 ## Description of the data joining, cleaning, etc. for combined data
 
@@ -999,11 +843,6 @@ with other variables, but these are not likely to cause significant
 issues with model estimation.
 
 
-
-
-
-
-
 ### Differences between region (CEE and WE)
 
 We will create two groups of countries to compare their innovation
@@ -1059,6 +898,7 @@ vet$country <- recode(
   "PT" = "PRT"
 )
 ```
+## Maps 
 
 ```{r}
 #| message: false
@@ -1073,15 +913,14 @@ europe <- world[world$region_un == "Europe", ]
 ```
 
 
-
-
-
 ```{r}
 #| message: false
 #| echo: false
 # Merge map data with vet data
 europe_merged <- merge(europe, vet, by.x = "sov_a3", by.y = "country", all.x = TRUE)
 ```
+
+## Maps 
 
 ```{r}
 #| message: false
@@ -1098,7 +937,7 @@ print(map_europe)
 ```
 
 
-
+# Interactive Maps 
 
 ```{r}
 #| message: false
@@ -1216,13 +1055,13 @@ print(summary_stats)
 
 We observe that, mean, sd, the R-squared of western is lower than the
 one of the eastern so the eastern countries patent application variation
-are more expalined by the variable sector and educational attainment
+are more explained by the variable sector and educational attainment
 (our model). However, there's 495 more observation in the central and
 eastern group than in the western group, this have effect on the
 R-squared, indeed, The group with more observations will likely have a
 more stable and robust R-squared value, while the smaller group might
 produce a less reliable one. So we need additional computation to
-conclude. We use a adjusted R-squarded becuase it's less sensitive to
+conclude. We use an adjusted R-square because it's less sensitive to
 sample size differences and gives a more accurate measure of how well
 the model fits the data when comparing groups with unequal sample sizes.
 
